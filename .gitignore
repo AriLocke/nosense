@@ -1,3 +1,6 @@
 bin
 image
 .vscode
+
+# Only appears if make set to not clean 
+obj

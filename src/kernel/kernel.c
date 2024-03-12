@@ -73,36 +73,36 @@ void hcf(void) {
 
 
 
-static volatile LIMINE_BASE_REVISION(1);
+// static volatile LIMINE_BASE_REVISION(1);
  
-static volatile struct limine_framebuffer_request framebuffer_request = {
-	.id = LIMINE_FRAMEBUFFER_REQUEST,
-	.revision = 0
-};
+// static volatile struct limine_framebuffer_request framebuffer_request = {
+// 	.id = LIMINE_FRAMEBUFFER_REQUEST,
+// 	.revision = 0
+// };
 
 // extern unsigned char _binary_libs_VGA[];
-void _start(void) {
+void kernel_main(void) {
 	// Ensure the bootloader actually understands our base revision (see spec).
-	if (LIMINE_BASE_REVISION_SUPPORTED == false) {
-		hcf();
-	}
+	// if (LIMINE_BASE_REVISION_SUPPORTED == false) {
+	// 	hcf();
+	// }
  
-	// Ensure we got a framebuffer.
-	if (framebuffer_request.response == NULL
-	 || framebuffer_request.response->framebuffer_count < 1) {
-		hcf();
-	}
+	// // Ensure we got a framebuffer.
+	// if (framebuffer_request.response == NULL
+	//  || framebuffer_request.response->framebuffer_count < 1) {
+	// 	hcf();
+	// }
 
-	// // Fetch the first framebuffer.
-	struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
+	// // // Fetch the first framebuffer.
+	// struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 	
-	terminal_initalize(framebuffer);
+	// terminal_initalize(framebuffer);
 
-	// // Note: we assume the framebuffer model is RGB with 32-bit pixels.
-	for (size_t i = 0; i < 100; i++) {
-		uint32_t *fb_ptr = framebuffer->address;
-		fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xaaffdd;
-	}
+	// terminal_write("123456789012345678901234567890", 30);
+	// terminal_write("123456789012345678901234567890", 30);
+	// terminal_write("123456789012345678901234567890", 30);
+	// terminal_write("123456789012345678901234567890", 30);
+	// terminal_write("123456789012345678901234567890", 30);
 
 	// We're done, just hang...
 	hcf();

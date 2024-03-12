@@ -1,5 +1,5 @@
-#ifndef KERNEL_H_
-#define KERNEL_H_
+#ifndef KERNEL_H
+#define KERNEL_H
 
 #include <stddef.h>
 
@@ -55,4 +55,4 @@ extern int memcmp(const void *lhs, const void *rhs, size_t count);
 extern void hcf(void);
 
 
-#endif // KERNEL_H_
+#endif
