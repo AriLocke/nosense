@@ -11,7 +11,7 @@ override KERNEL := nosense
 
 CC = ~/opt/cross/bin/i686-elf-gcc
 LD = ~/opt/cross/bin/i686-elf-gcc -T
-AS = ~/opt/cross/bin/i686-elf-as
+AS = ~/opt/cross/bin/i686-elf-gcc
 
 CFLAGS?=-O2 # -g -pipe
 CPPFLAGS?= # -std=gnu99
@@ -139,7 +139,7 @@ obj/%.c.o: src/%.c GNUmakefile
 # Compilation rules for *.S files.
 obj/%.S.o: src/%.S GNUmakefile
 	mkdir -p "$$(dirname $@)"
-	$(AS) -c $< -o $@
+	$(AS) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
  
 # Compilation rules for *.asm (nasm) files.
 obj/%.asm.o: src/%.asm GNUmakefile
