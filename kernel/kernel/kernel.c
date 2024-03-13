@@ -1,6 +1,7 @@
 #include <kernel/tty.h>
 
 #include <lib/multiboot.h>
+#include <stdio.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -26,7 +27,8 @@ void kernel_main(unsigned long magic, unsigned long addr) {
 	terminal_initalize(mbi);
 
 	terminal_write("123456789012345678901234567890", 30);
-	// terminal_write("123456789012345678901234567890", 30);
+	// printf("printf:123456789012345678901234567890");
+	// terminal_writestring("termwritestring:123456789012345678901234567890");
 	// terminal_write("123456789012345678901234567890", 30);
 	// terminal_write("123456789012345678901234567890", 30);
 	// terminal_write("123456789012345678901234567890", 30);
