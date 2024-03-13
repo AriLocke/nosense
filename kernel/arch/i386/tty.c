@@ -1,15 +1,19 @@
-#define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
-#include <ssfn.h>
-#include <multiboot.h>
-#include <incbin.h>
+#include <kernel/tty.h>
 
-INCBIN(ConsoleFont, "libs/u_vga16.sfn");
+#include <string.h>
+
+#define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
+#include <lib/ssfn.h>
+#include <lib/multiboot.h>
+#include <lib/incbin.h>
+
+// INCBIN(ConsoleFont, "u_vga16.sfn");
 
 // static int current_row = 0;
 
 void terminal_initalize(struct multiboot_info *mbi) {
 	/* set up context by global variables */
-	ssfn_src = & gConsoleFontData[0];      /* the bitmap font to use */
+	// ssfn_src = & gConsoleFontData[0];      /* the bitmap font to use */
 
 	ssfn_dst.ptr = mbi->framebuffer_addr;					/* address of the linear frame buffer */
 	ssfn_dst.w = mbi->framebuffer_width;						/* width */
@@ -30,4 +34,8 @@ void terminal_write(const char* data, size_t size) {
 		terminal_putchar(data[i]);
 	}
 	terminal_putchar('\n');
+}
+
+terminal_writestring(const char* data) {
+    // terminal_write(data, strlen(data));
 }

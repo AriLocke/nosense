@@ -73,6 +73,8 @@ _start:
 	*/
 	mov $stack_top, %esp
 
+	call _init
+
 	/* Initialize the stack pointer. */
 	/*  movl    $(stack + STACK_SIZE), %esp */
 
@@ -98,9 +100,7 @@ _start:
 	/*
 	If the system has nothing more to do, put the computer into an
 	infinite loop. */
-	cli
-1:	hlt
-	jmp 1b
+	call hcf
 
 /*
 Set the size of the _start symbol to the current location '.' minus its start.

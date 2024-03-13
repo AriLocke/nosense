@@ -1,6 +1,9 @@
 bin
 image
 .vscode
-
-# Only appears if make set to not clean 
 obj
+sysroot
+*.kernel
+*.iso
+*.img
+iso_root

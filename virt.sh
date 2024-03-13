@@ -1,5 +1,6 @@
 #!/bin/sh
-cd image
+set -e
+. ./iso.sh
 
 virt-install --name nosense-vm \
 --osinfo detect=on,require=off \

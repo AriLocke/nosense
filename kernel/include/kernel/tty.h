@@ -1,7 +1,7 @@
 #ifndef KERNEL_TTY_H
 #define KERNEL_TTY_H
 
-#include <multiboot.h>
+#include <lib/multiboot.h>
 #include <stddef.h>
 
 void terminal_initalize(struct multiboot_info* mbi);
