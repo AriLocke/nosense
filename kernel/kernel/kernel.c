@@ -16,19 +16,21 @@ void hcf(void) {
 	}
 }
 
+multiboot_info_t *mbi;
 
-// extern unsigned char _binary_libs_VGA[];
-void kernel_main(unsigned long magic, unsigned long addr) {
+void kernel_boot(unsigned long magic, unsigned long addr) {
 
 	if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
 		hcf();
 
-	multiboot_info_t *mbi = (multiboot_info_t *) addr;
-	terminal_initalize(mbi);
+	mbi = (multiboot_info_t *) addr;
+}
 
-	terminal_write("123456789012345678901234567890", 30);
-	// printf("printf:123456789012345678901234567890");
-	// terminal_writestring("termwritestring:123456789012345678901234567890");
+// extern unsigned char _binary_libs_VGA[];
+void kernel_main(void) {
+	terminal_initalize(mbi);
+	terminal_writestring("termwritestring:");
+	printf("printf:");
 	// terminal_write("123456789012345678901234567890", 30);
 	// terminal_write("123456789012345678901234567890", 30);
 	// terminal_write("123456789012345678901234567890", 30);

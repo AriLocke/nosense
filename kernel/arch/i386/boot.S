@@ -73,8 +73,6 @@ _start:
 	*/
 	mov $stack_top, %esp
 
-	call _init
-
 	/* Initialize the stack pointer. */
 	/*  movl    $(stack + STACK_SIZE), %esp */
 
@@ -86,6 +84,10 @@ _start:
 	pushl   %ebx
 	/* Push the magic value. */
 	pushl   %eax
+	
+	call kernel_boot
+
+	call _init
 	
 	/*
 	Enter the high-level kernel. The ABI requires the stack is 16-byte
