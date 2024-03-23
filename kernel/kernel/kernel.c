@@ -29,9 +29,16 @@ void kernel_boot(unsigned long magic, unsigned long addr) {
 // extern unsigned char _binary_libs_VGA[];
 void kernel_main(void) {
 	terminal_initalize(mbi);
-	terminal_writestring("termwritestring:");
-	printf("printf:");
-	// terminal_write("123456789012345678901234567890", 30);
-	// terminal_write("123456789012345678901234567890", 30);
-	// terminal_write("123456789012345678901234567890", 30);
+	printf("test 1\n");
+	printf("test 2\n");
+	printf("test 3\n");
+	printf("test 1\n");
+	printf("test 2\n");
+	printf("test 3\n");
+	printf("test 1\n");
+	printf("test 2\n");
+	printf("test 3\n");
+	printf("test 1\n");
+	printf("test 2\n");
+	printf("test 3\n");
 }
