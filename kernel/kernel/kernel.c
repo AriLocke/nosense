@@ -1,10 +1,9 @@
 #include <kernel/tty.h>
+#include <kernel/gdt.h>
 
 #include <lib/multiboot.h>
-#include <stdio.h>
 
-#include <stdint.h>
-#include <stddef.h>
+#include <stdio.h>
 #include <stdbool.h>
 
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -24,6 +23,8 @@ void kernel_boot(unsigned long magic, unsigned long addr) {
 		hcf();
 
 	mbi = (multiboot_info_t *) addr;
+
+  gdt_install();
 }
 
 // extern unsigned char _binary_libs_VGA[];

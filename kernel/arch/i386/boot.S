@@ -4,7 +4,7 @@
 #else
 #define EXT_C(sym)                     sym
 #endif
-;#define STACK_SIZE                      0x4000
+#define STACK_SIZE                      0x4000
 
 .set ALIGN,    		1<<0			/* align loaded modules on page boundaries */
 .set MEMINFO,  		1<<1			/* provide memory map */
@@ -29,7 +29,7 @@
 .long MAGIC	# Required
 .long FLAGS				# Required
 .long CHECKSUM			# Required
-.long HEADER_ADDR		# Unused unless ADDRESSINFO is flagged
+.long HEADER_ADDR		# Unused unless ADDREsSINFO is flagged
 .long LOAD_ADDR			# Unused unless ADDRESSINFO is flagged
 .long LOAD_END_ADDR		# Unused unless ADDRESSINFO is flagged
 .long BSS_END_ADDR		# Unused unless ADDRESSINFO is flagged
@@ -109,3 +109,22 @@ Set the size of the _start symbol to the current location '.' minus its start.
 This is useful when debugging or when you implement call tracing.
 */
 .size _start, . - _start
+
+/* This will set up our new segment registers. We need to do
+ something special in order to set CS. We do what is called a
+ far jump. A jump that includes a segment as well as an offset.
+ This is declared in C as 'extern void gdt_flush();' */
+ 
+.global gdt_flush     # Allows the C code to link to this
+.extern gp            # Says that '_gp' is in another file
+gdt_flush:
+    lgdt gp        # Load the GDT with our '_gp' which is a special pointer
+    mov $0x10, %ax       # 0x10 is the offset in the GDT to our data segment
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
+    mov %ax, %ss
+    jmp $0x08,$flush2 # 0x08 is the offset to our code segment: Far jump!
+flush2:
+    ret               # Returns back to the C

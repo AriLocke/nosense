@@ -6,4 +6,5 @@ sysroot
 *.kernel
 *.iso
 *.img
+.clangd
 iso_root
