@@ -7,7 +7,6 @@
 #include <lib/multiboot.h>
 #include <lib/incbin.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 INCBIN(ConsoleFont, "../lib/u_vga16.sfn");
 
@@ -33,8 +32,8 @@ char *int_to_string_alloc(int x) {
     *p = '-';
   }
   size_t len = (size_t) (&buf[sizeof buf] - p);
-  char *s = malloc(len);
-  // char *s = "00000000000000";
+  //char *s = malloc(len);
+  char *s = 0;
   if (s) {
     memcpy(s, p, len);
   }
