@@ -1,5 +1,7 @@
 #include <kernel/tty.h>
 #include <kernel/gdt.h>
+#include <kernel/idt.h>
+#include <kernel/isrs.h>
 
 #include <lib/multiboot.h>
 
@@ -25,6 +27,8 @@ void kernel_boot(unsigned long magic, unsigned long addr) {
 	mbi = (multiboot_info_t *) addr;
 
   gdt_install();
+  idt_install();
+  isrs_install();
 }
 
 // extern unsigned char _binary_libs_VGA[];
@@ -36,7 +40,10 @@ void kernel_main(void) {
 	printf("test 1\n");
 	printf("test 2\n");
 	printf("test 3\n");
-	printf("test 1\n");
+	printf("test ----\n");
+  // asm ("int $0x0000");
+  volatile int test = 0;
+  volatile int apple = 12 / test;
 	printf("test 2\n");
 	printf("test 3\n");
 	printf("test 1\n");

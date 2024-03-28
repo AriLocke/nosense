@@ -86,7 +86,8 @@ _start:
 	pushl   %eax
 	
 	call kernel_boot
-
+  sti
+  # cli
 	call _init
 	
 	/*
@@ -108,7 +109,7 @@ _start:
 Set the size of the _start symbol to the current location '.' minus its start.
 This is useful when debugging or when you implement call tracing.
 */
-.size _start, . - _start
+# .size _start, . - _start
 
 /* This will set up our new segment registers. We need to do
  something special in order to set CS. We do what is called a
@@ -128,3 +129,96 @@ gdt_flush:
     jmp $0x08,$flush2 # 0x08 is the offset to our code segment: Far jump!
 flush2:
     ret               # Returns back to the C
+
+# Loads the IDT defined in '_idtp' into the processor.
+# This is declared in C as 'extern void idt_load();'
+.global idt_load
+.extern idtp
+idt_load:
+    lidt idtp
+    ret
+
+
+
+# Generate Interupt Stubs
+.extern fault_handler
+
+.macro isr_err_stub num
+.global isr\num
+isr\num:
+    #mov $\num, %eax
+    call fault_handler
+    iret 
+.endm
+
+.macro isr_no_err_stub num
+.global isr\num
+isr\num:
+    #mov $\num, %eax
+    call fault_handler
+    iret
+.endm
+
+isr_no_err_stub 0
+isr_no_err_stub 1
+isr_no_err_stub 2
+isr_no_err_stub 3
+isr_no_err_stub 4
+isr_no_err_stub 5
+isr_no_err_stub 6
+isr_no_err_stub 7
+isr_err_stub    8
+isr_no_err_stub 9
+isr_err_stub    10
+isr_err_stub    11
+isr_err_stub    12
+isr_err_stub    13
+isr_err_stub    14
+isr_no_err_stub 15
+isr_no_err_stub 16
+isr_err_stub    17
+isr_no_err_stub 18
+isr_no_err_stub 19
+isr_no_err_stub 20
+isr_no_err_stub 21
+isr_no_err_stub 22
+isr_no_err_stub 23
+isr_no_err_stub 24
+isr_no_err_stub 25
+isr_no_err_stub 26
+isr_no_err_stub 27
+isr_no_err_stub 28
+isr_no_err_stub 29
+isr_err_stub    30
+isr_no_err_stub 31
+
+/* This is our common ISR stub. It saves the processor state, sets
+* up for kernel mode segments, calls the C-level fault handler,
+* and finally restores the stack frame. */ /*
+isr_common_stub:
+    /*pusha
+    push %ds
+    push %es
+    push %fs
+    push %gs
+    #mov $0x10, %ax  # Load the Kernel Data Segment descriptor!
+    #mov %ax, %ds
+    #mov %ax, %es
+    #mov %ax, %fs
+    #mov %ax, %gs
+    mov %esp, %eax   # Push us the stack
+    push %eax */
+   /* pop %eax
+    pop %ebx
+    call fault_handler
+    #mov fault_handler, %eax
+   #call %eax       # A special call, preserves the 'eip' register
+    /*pop %eax
+    pop %gs
+    pop %fs
+    pop %es
+    pop %ds
+    popa
+    add %esp, 8     # Cleans up the pushed error code and pushed ISR number ---------- MAY BE BACKWARDS!!!! THIS WAS INTEL SYNTAX.*/
+    #iret           # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
+    

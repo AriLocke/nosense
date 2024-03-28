@@ -12,6 +12,8 @@ INCBIN(ConsoleFont, "../lib/u_vga16.sfn");
 
 // static int current_row = 0;
 
+
+/*
 #define INT_DECIMAL_STRING_SIZE(int_type) ((CHAR_BIT*sizeof(int_type)-1)*10/33+3)
 
 char *int_to_string_alloc(int x) {
@@ -39,7 +41,7 @@ char *int_to_string_alloc(int x) {
   }
   return s;
 }
-
+*/
 
 
 static size_t terminal_row;
