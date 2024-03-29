@@ -86,7 +86,7 @@ _start:
 	pushl   %eax
 	
 	call kernel_boot
-  sti
+    sti
   # cli
 	call _init
 	
@@ -139,23 +139,39 @@ idt_load:
     ret
 
 
-
 # Generate Interupt Stubs
 .extern fault_handler
 
 .macro isr_err_stub num
 .global isr\num
 isr\num:
+    pusha
+    cld
     #mov $\num, %eax
     call fault_handler
+    popa
     iret 
 .endm
 
 .macro isr_no_err_stub num
 .global isr\num
 isr\num:
+    pusha
+    cld
     #mov $\num, %eax
     call fault_handler
+    popa
+    iret 
+.endm
+
+.extern irq_handler
+
+.macro isr_irq_stub num
+.global isr\num
+isr\num:
+    pusha
+    call irq_handler
+    popa
     iret
 .endm
 
@@ -191,6 +207,23 @@ isr_no_err_stub 28
 isr_no_err_stub 29
 isr_err_stub    30
 isr_no_err_stub 31
+
+isr_irq_stub 32
+isr_irq_stub 33
+isr_irq_stub 34
+isr_irq_stub 35
+isr_irq_stub 36
+isr_irq_stub 37
+isr_irq_stub 38
+isr_irq_stub 39
+isr_irq_stub 40
+isr_irq_stub 41
+isr_irq_stub 42
+isr_irq_stub 43
+isr_irq_stub 44
+isr_irq_stub 45
+isr_irq_stub 46
+isr_irq_stub 47
 
 /* This is our common ISR stub. It saves the processor state, sets
 * up for kernel mode segments, calls the C-level fault handler,

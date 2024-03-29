@@ -40,6 +40,22 @@ extern void isr28();
 extern void isr29();
 extern void isr30();
 extern void isr31();
+extern void isr32();
+extern void isr33();
+extern void isr34();
+extern void isr35();
+extern void isr36();
+extern void isr37();
+extern void isr38();
+extern void isr39();
+extern void isr40();
+extern void isr41();
+extern void isr42();
+extern void isr43();
+extern void isr44();
+extern void isr45();
+extern void isr46();
+extern void isr47();
 
 /* This is a very repetitive function... it's not hard, it's
 *  just annoying. As you can see, we set the first 32 entries
@@ -84,6 +100,22 @@ void isrs_install()
     idt_set_gate(29, (unsigned)isr29, 0x08, 0x8E);
     idt_set_gate(30, (unsigned)isr30, 0x08, 0x8E);
     idt_set_gate(31, (unsigned)isr31, 0x08, 0x8E);
+    idt_set_gate(32, (unsigned)isr32, 0x08, 0x8E);
+    idt_set_gate(33, (unsigned)isr33, 0x08, 0x8E);
+    idt_set_gate(34, (unsigned)isr34, 0x08, 0x8E);
+    idt_set_gate(35, (unsigned)isr35, 0x08, 0x8E);
+    idt_set_gate(36, (unsigned)isr36, 0x08, 0x8E);
+    idt_set_gate(37, (unsigned)isr37, 0x08, 0x8E);
+    idt_set_gate(38, (unsigned)isr38, 0x08, 0x8E);
+    idt_set_gate(39, (unsigned)isr39, 0x08, 0x8E);
+    idt_set_gate(40, (unsigned)isr40, 0x08, 0x8E);
+    idt_set_gate(41, (unsigned)isr41, 0x08, 0x8E);
+    idt_set_gate(42, (unsigned)isr42, 0x08, 0x8E);
+    idt_set_gate(43, (unsigned)isr43, 0x08, 0x8E);
+    idt_set_gate(44, (unsigned)isr44, 0x08, 0x8E);
+    idt_set_gate(45, (unsigned)isr45, 0x08, 0x8E);
+    idt_set_gate(46, (unsigned)isr46, 0x08, 0x8E);
+    idt_set_gate(47, (unsigned)isr47, 0x08, 0x8E);
 }
 
 unsigned char *exception_messages[] =
@@ -123,32 +155,6 @@ unsigned char *exception_messages[] =
 };
 
 #include <string.h>
-#define INT_DECIMAL_STRING_SIZE(int_type) ((CHAR_BIT*sizeof(int_type)-1)*10/33+3)
-char *int_to_string_alloc(int x) {
-  int i = x;
-  char buf[INT_DECIMAL_STRING_SIZE(int)];
-  char *p = &buf[sizeof buf] - 1;
-  *p = '\0';
-  if (i >= 0) {
-    i = -i;
-  }
-  do {
-    p--;
-    *p = (char) ('0' - i % 10);
-    i /= 10;
-  } while (i);
-  if (x < 0) {
-    p--;
-    *p = '-';
-  }
-  size_t len = (size_t) (&buf[sizeof buf] - p);
-  //char *s = malloc(len);
-  char *s = 0;
-  if (s) {
-    memcpy(s, p, len);
-  }
-  return s;
-}
 /* All of our Exception handling Interrupt Service Routines will
 *  point to this function. This will tell us what exception has
 *  happened! Right now, we simply halt the system by hitting an
@@ -169,4 +175,3 @@ void fault_handler(uint32_t eax) //struct regs *r)
         for (;;);
   //  }
 }
-
