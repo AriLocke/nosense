@@ -15,8 +15,8 @@
 void isrs_install();
 
 // __attribute__((noreturn))
-void fault_handler(uint32_t eax);
+void fault_handler(uint32_t num);
 
-void irq_handler(uint32_t eax);
+void irq_handler(uint32_t num);
 
 #endif

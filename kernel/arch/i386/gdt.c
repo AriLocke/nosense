@@ -1,29 +1,25 @@
 #include <kernel/gdt.h>
+#include <stdint.h>
 
 struct gdt_entry
 {
-    unsigned short limit_low;
-    unsigned short base_low;
-    unsigned char base_middle;
-    unsigned char access;
-    unsigned char granularity;
-    unsigned char base_high;
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t base_middle;
+    uint8_t access;
+    uint8_t granularity;
+    uint8_t base_high;
 } __attribute__((packed));
 
-/* Special pointer which includes the limit: The max bytes
-*  taken up by the GDT, minus 1. Again, this NEEDS to be packed */
 struct gdt_ptr
 {
-    unsigned short limit;
-    unsigned int base;
+    uint16_t limit;
+    uint32_t base;
 } __attribute__((packed));
 
-/* Our GDT, with 3 entries, and finally our special GDT pointer */
 struct gdt_entry gdt[3];
 struct gdt_ptr gp;
 
-/* This will be a function in start.asm. We use this to properly
-*  reload the new segment registers */
 extern void gdt_flush();
 
 /* Setup a descriptor in the Global Descriptor Table */
@@ -52,7 +48,7 @@ void gdt_install()
 {
     /* Setup the GDT pointer and limit */
     gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
-    gp.base = &gdt;
+    gp.base = (uintptr_t) &gdt;
 
     /* Our NULL descriptor */
     gdt_set_gate(0, 0, 0, 0, 0);

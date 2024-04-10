@@ -6,7 +6,7 @@
 
 #include <lib/multiboot.h>
 
-#include <stdbool.h>
+#include <stdint.h>
 
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
@@ -21,7 +21,7 @@ void hcf(void) {
 
 multiboot_info_t *mbi;
 
-void kernel_boot(unsigned long magic, unsigned long addr) {
+void kernel_boot(uint64_t magic, uint64_t addr) {
 
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
         hcf();

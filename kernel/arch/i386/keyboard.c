@@ -2,18 +2,17 @@
 #include <kernel/pic.h>
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #define KEYBOARD_DATA_PORT   0x60
 #define KEYBOARD_STATUS_PORT 0x64
 
-static volatile struct bitflags {
-    unsigned int shift_held;// : 1 ;
+struct bitflags {
+    uint8_t shift_held : 1 ;
 };
 
 static struct bitflags bf;
 
-unsigned char *keyboard_map[128] =
+char *keyboard_map[128] =
 {
     0,  0, "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "\b",	/* Backspace */
   "\t" /* Tab */,	"q", "w", "e", "r",	"t", "y", "u", "i", "o", "p", "[", "]", "\n",	/* Enter key */
@@ -88,7 +87,7 @@ void keyscan(void) {
                 if (keycode > KEYBOARD_RELEASE) { // Key Release
 
                 } else { // Key Press
-                    unsigned char mappedkey = *keyboard_map[(unsigned char) keycode];
+                    char mappedkey = *keyboard_map[(unsigned char) keycode];
                     if (bf.shift_held) {
                         to_upper(&mappedkey);
                     }

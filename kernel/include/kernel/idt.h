@@ -1,7 +1,8 @@
 #ifndef KERNEL_IDT_H
 #define KERNEL_IDT_H
 
-void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags);
+#include <stdint.h>
+void idt_set_gate(uint8_t num, uint64_t base, uint16_t sel, uint16_t flags);
 
 void idt_install();
 

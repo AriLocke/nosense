@@ -66,57 +66,57 @@ extern void isr47();
 *  hex. */
 void isrs_install()
 {
-    idt_set_gate(0, (unsigned)isr0, 0x08, 0x8E);
-    idt_set_gate(1, (unsigned)isr1, 0x08, 0x8E);
-    idt_set_gate(2, (unsigned)isr2, 0x08, 0x8E);
-    idt_set_gate(3, (unsigned)isr3, 0x08, 0x8E);
-    idt_set_gate(4, (unsigned)isr4, 0x08, 0x8E);
-    idt_set_gate(5, (unsigned)isr5, 0x08, 0x8E);
-    idt_set_gate(6, (unsigned)isr6, 0x08, 0x8E);
-    idt_set_gate(7, (unsigned)isr7, 0x08, 0x8E);
-    idt_set_gate(8, (unsigned)isr8, 0x08, 0x8E);
-    idt_set_gate(9, (unsigned)isr9, 0x08, 0x8E);
-    idt_set_gate(10, (unsigned)isr10, 0x08, 0x8E);
-    idt_set_gate(11, (unsigned)isr11, 0x08, 0x8E);
-    idt_set_gate(12, (unsigned)isr12, 0x08, 0x8E);
-    idt_set_gate(13, (unsigned)isr13, 0x08, 0x8E);
-    idt_set_gate(14, (unsigned)isr14, 0x08, 0x8E);
-    idt_set_gate(15, (unsigned)isr15, 0x08, 0x8E);
-    idt_set_gate(16, (unsigned)isr16, 0x08, 0x8E);
-    idt_set_gate(17, (unsigned)isr17, 0x08, 0x8E);
-    idt_set_gate(18, (unsigned)isr18, 0x08, 0x8E);
-    idt_set_gate(19, (unsigned)isr19, 0x08, 0x8E);
-    idt_set_gate(20, (unsigned)isr20, 0x08, 0x8E);
-    idt_set_gate(21, (unsigned)isr21, 0x08, 0x8E);
-    idt_set_gate(22, (unsigned)isr22, 0x08, 0x8E);
-    idt_set_gate(23, (unsigned)isr23, 0x08, 0x8E);
-    idt_set_gate(24, (unsigned)isr24, 0x08, 0x8E);
-    idt_set_gate(25, (unsigned)isr25, 0x08, 0x8E);
-    idt_set_gate(26, (unsigned)isr26, 0x08, 0x8E);
-    idt_set_gate(27, (unsigned)isr27, 0x08, 0x8E);
-    idt_set_gate(28, (unsigned)isr28, 0x08, 0x8E);
-    idt_set_gate(29, (unsigned)isr29, 0x08, 0x8E);
-    idt_set_gate(30, (unsigned)isr30, 0x08, 0x8E);
-    idt_set_gate(31, (unsigned)isr31, 0x08, 0x8E);
-    idt_set_gate(32, (unsigned)isr32, 0x08, 0x8E);
-    idt_set_gate(33, (unsigned)isr33, 0x08, 0x8E);
-    idt_set_gate(34, (unsigned)isr34, 0x08, 0x8E);
-    idt_set_gate(35, (unsigned)isr35, 0x08, 0x8E);
-    idt_set_gate(36, (unsigned)isr36, 0x08, 0x8E);
-    idt_set_gate(37, (unsigned)isr37, 0x08, 0x8E);
-    idt_set_gate(38, (unsigned)isr38, 0x08, 0x8E);
-    idt_set_gate(39, (unsigned)isr39, 0x08, 0x8E);
-    idt_set_gate(40, (unsigned)isr40, 0x08, 0x8E);
-    idt_set_gate(41, (unsigned)isr41, 0x08, 0x8E);
-    idt_set_gate(42, (unsigned)isr42, 0x08, 0x8E);
-    idt_set_gate(43, (unsigned)isr43, 0x08, 0x8E);
-    idt_set_gate(44, (unsigned)isr44, 0x08, 0x8E);
-    idt_set_gate(45, (unsigned)isr45, 0x08, 0x8E);
-    idt_set_gate(46, (unsigned)isr46, 0x08, 0x8E);
-    idt_set_gate(47, (unsigned)isr47, 0x08, 0x8E);
+    idt_set_gate(0,  (uintptr_t)isr0, 0x08, 0x8E);
+    idt_set_gate(1,  (uintptr_t)isr1, 0x08, 0x8E);
+    idt_set_gate(2,  (uintptr_t)isr2, 0x08, 0x8E);
+    idt_set_gate(3,  (uintptr_t)isr3, 0x08, 0x8E);
+    idt_set_gate(4,  (uintptr_t)isr4, 0x08, 0x8E);
+    idt_set_gate(5,  (uintptr_t)isr5, 0x08, 0x8E);
+    idt_set_gate(6,  (uintptr_t)isr6, 0x08, 0x8E);
+    idt_set_gate(7,  (uintptr_t)isr7, 0x08, 0x8E);
+    idt_set_gate(8,  (uintptr_t)isr8, 0x08, 0x8E);
+    idt_set_gate(9,  (uintptr_t)isr9, 0x08, 0x8E);
+    idt_set_gate(10, (uintptr_t)isr10, 0x08, 0x8E);
+    idt_set_gate(11, (uintptr_t)isr11, 0x08, 0x8E);
+    idt_set_gate(12, (uintptr_t)isr12, 0x08, 0x8E);
+    idt_set_gate(13, (uintptr_t)isr13, 0x08, 0x8E);
+    idt_set_gate(14, (uintptr_t)isr14, 0x08, 0x8E);
+    idt_set_gate(15, (uintptr_t)isr15, 0x08, 0x8E);
+    idt_set_gate(16, (uintptr_t)isr16, 0x08, 0x8E);
+    idt_set_gate(17, (uintptr_t)isr17, 0x08, 0x8E);
+    idt_set_gate(18, (uintptr_t)isr18, 0x08, 0x8E);
+    idt_set_gate(19, (uintptr_t)isr19, 0x08, 0x8E);
+    idt_set_gate(20, (uintptr_t)isr20, 0x08, 0x8E);
+    idt_set_gate(21, (uintptr_t)isr21, 0x08, 0x8E);
+    idt_set_gate(22, (uintptr_t)isr22, 0x08, 0x8E);
+    idt_set_gate(23, (uintptr_t)isr23, 0x08, 0x8E);
+    idt_set_gate(24, (uintptr_t)isr24, 0x08, 0x8E);
+    idt_set_gate(25, (uintptr_t)isr25, 0x08, 0x8E);
+    idt_set_gate(26, (uintptr_t)isr26, 0x08, 0x8E);
+    idt_set_gate(27, (uintptr_t)isr27, 0x08, 0x8E);
+    idt_set_gate(28, (uintptr_t)isr28, 0x08, 0x8E);
+    idt_set_gate(29, (uintptr_t)isr29, 0x08, 0x8E);
+    idt_set_gate(30, (uintptr_t)isr30, 0x08, 0x8E);
+    idt_set_gate(31, (uintptr_t)isr31, 0x08, 0x8E);
+    idt_set_gate(32, (uintptr_t)isr32, 0x08, 0x8E);
+    idt_set_gate(33, (uintptr_t)isr33, 0x08, 0x8E);
+    idt_set_gate(34, (uintptr_t)isr34, 0x08, 0x8E);
+    idt_set_gate(35, (uintptr_t)isr35, 0x08, 0x8E);
+    idt_set_gate(36, (uintptr_t)isr36, 0x08, 0x8E);
+    idt_set_gate(37, (uintptr_t)isr37, 0x08, 0x8E);
+    idt_set_gate(38, (uintptr_t)isr38, 0x08, 0x8E);
+    idt_set_gate(39, (uintptr_t)isr39, 0x08, 0x8E);
+    idt_set_gate(40, (uintptr_t)isr40, 0x08, 0x8E);
+    idt_set_gate(41, (uintptr_t)isr41, 0x08, 0x8E);
+    idt_set_gate(42, (uintptr_t)isr42, 0x08, 0x8E);
+    idt_set_gate(43, (uintptr_t)isr43, 0x08, 0x8E);
+    idt_set_gate(44, (uintptr_t)isr44, 0x08, 0x8E);
+    idt_set_gate(45, (uintptr_t)isr45, 0x08, 0x8E);
+    idt_set_gate(46, (uintptr_t)isr46, 0x08, 0x8E);
+    idt_set_gate(47, (uintptr_t)isr47, 0x08, 0x8E);
 }
 
-unsigned char *exception_messages[] =
+char *exception_messages[] =
 {
     "Division By Zero",               
     "Debug",
@@ -153,33 +153,33 @@ unsigned char *exception_messages[] =
 };
 
 
-void fault_handler(uint32_t eax) {
+void fault_handler(uint32_t num) {
   /* Is this a fault whose number is from 0 to 31? */
-    if (eax < 32) {
+    if (num < 32) {
         char a[10];
         printf("\nInterupt ");
-        printf(itoa(eax, a, 10));
+        printf(itoa(num, a, 10));
         printf(", ");
-        printf(exception_messages[eax]);
+        printf(exception_messages[num]);
         printf(" Exception Occured. System Halted!\n");
         for (;;);
     } else {
         printf("Impossible Exception Called: ");
         char a[10];
-        printf(itoa(eax, a, 10));
+        printf(itoa(num, a, 10));
     }
 }
 
-void irq_handler(uint32_t eax) {
+void irq_handler(uint32_t num) {
 
     // pic_sendEOI(1);
     
-    if (eax == 33) { // Keyboard Interupt
+    if (num == 33) { // Keyboard Interupt
         keyscan();
     } else {
         printf("\nUnhandled IRQ #");
         char a[10];
-        printf(itoa(eax, a, 10));
+        printf(itoa(num, a, 10));
     }
     pic_sendEOI(1);
 }

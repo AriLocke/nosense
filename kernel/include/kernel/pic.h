@@ -19,6 +19,4 @@ uint16_t pic_get_isr(void);
 
 void pic_initalize(void);
 
-void irq_handler(uint32_t eax);
-
 #endif

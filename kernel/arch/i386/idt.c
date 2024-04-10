@@ -14,8 +14,8 @@ struct idt_entry
 
 struct idt_ptr
 {
-    unsigned short limit;
-    unsigned int base;
+    uint16_t limit;
+    uint32_t base;
 } __attribute__((packed));
 
 /* Declare an IDT of 256 entries. Although we will only use the
@@ -32,8 +32,7 @@ extern void idt_load();
 
 /* Use this function to set an entry in the IDT. Alot simpler
 *  than twiddling with the GDT ;) */
-void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags)
-{
+void idt_set_gate(uint8_t num, uint64_t base, uint16_t sel, uint16_t flags) {
   /* Setup the descriptor base address */
   idt[num].base_lo = (base & 0xFFFF);
   idt[num].base_hi = (base >> 16) & 0xFFFF;
@@ -47,11 +46,10 @@ void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, uns
 }
 
 /* Installs the IDT */
-void idt_install()
-{
+void idt_install() {
     /* Sets the special IDT pointer up, just like in 'gdt.c' */
     idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
-    idtp.base = &idt;
+    idtp.base = (uintptr_t) &idt;
 
     /* Clear out the entire IDT, initializing it to zeros */
     memset(&idt, 0, sizeof(struct idt_entry) * 256);
