@@ -1,5 +1,6 @@
 #include <kernel/tty.h>
 
+#include <stdio.h>
 #include <string.h>
 
 #define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
@@ -10,99 +11,77 @@
 
 INCBIN(ConsoleFont, "../lib/u_vga16.sfn");
 
-// static int current_row = 0;
-
-
-/*
-#define INT_DECIMAL_STRING_SIZE(int_type) ((CHAR_BIT*sizeof(int_type)-1)*10/33+3)
-
-char *int_to_string_alloc(int x) {
-  int i = x;
-  char buf[INT_DECIMAL_STRING_SIZE(int)];
-  char *p = &buf[sizeof buf] - 1;
-  *p = '\0';
-  if (i >= 0) {
-    i = -i;
-  }
-  do {
-    p--;
-    *p = (char) ('0' - i % 10);
-    i /= 10;
-  } while (i);
-  if (x < 0) {
-    p--;
-    *p = '-';
-  }
-  size_t len = (size_t) (&buf[sizeof buf] - p);
-  //char *s = malloc(len);
-  char *s = 0;
-  if (s) {
-    memcpy(s, p, len);
-  }
-  return s;
-}
-*/
-
-
 static size_t terminal_row;
 static size_t terminal_column;
 
 static size_t terminal_width;
 static size_t terminal_height;
 
+static char key_buffer[256]; 
+
 void terminal_initalize(struct multiboot_info *mbi) {
 	/* set up context by global variables */
-	terminal_row = 0;
-	terminal_column = 0;
+	  terminal_row = 0;
+	  terminal_column = 0;
 
-	ssfn_src = & gConsoleFontData[0];      /* the bitmap font to use */
+	  ssfn_src = &gConsoleFontData[0];                                /* the bitmap font to use */
 
-	ssfn_dst.ptr = mbi->framebuffer_addr;					/* address of the linear frame buffer */
-	ssfn_dst.w = mbi->framebuffer_width;						/* width */
-	ssfn_dst.h = mbi->framebuffer_height;						/* height */
-	ssfn_dst.p = mbi->framebuffer_bpp * mbi->framebuffer_width / 8;	/* bytes per line */
-	ssfn_dst.x = ssfn_dst.y = 0;//ssfn_src->width;							/* pen position */
+	  ssfn_dst.ptr = mbi->framebuffer_addr;					                  /* address of the linear frame buffer */
+	  ssfn_dst.w = mbi->framebuffer_width;                						/* width */
+	  ssfn_dst.h = mbi->framebuffer_height;						                /* height */
+	  ssfn_dst.p = mbi->framebuffer_bpp * mbi->framebuffer_width / 8;	/* bytes per line */
+	  ssfn_dst.x = ssfn_dst.y = 0;                                    /* pen position */
 
-	ssfn_dst.fg = 0xFFFFFF;		/* foreground color */ 	
+    ssfn_dst.fg = 0xFFFFFF;		/* foreground color */ 
 
-  terminal_width = ssfn_dst.w / ssfn_src->width;
-  terminal_height = ssfn_dst.w / ssfn_src->height;
-
-
-	// printf("screen: ");
-	// char *w = int_to_string_alloc(mbi->framebuffer_width);
-	// printf(w);
-	
-  // printf("x");
-	// char *h = int_to_string_alloc(mbi->framebuffer_height);
-	// printf(h);
-
-  // printf(".   2845: ");
-	// char *t = int_to_string_alloc(2845);
-	// printf(t);
+    terminal_width = ssfn_dst.w / ssfn_src->width;
+    terminal_height = (ssfn_dst.h / ssfn_src->height) - 1;
 }
 
-void terminal_scroll(int line) {
-  
+void terminal_scroll(int lines) {
+    char *a;
+    printf(itoa(terminal_height, a, 10));
+    printf(itoa(terminal_row, a, 10));
+    uint32_t jumpbytes = lines * ssfn_dst.p * ssfn_src->height; // bytes to jump up by
+    uint8_t* destination = ssfn_dst.ptr;
+    uint8_t* source = destination + jumpbytes;
+    uint32_t bytestomove = (ssfn_dst.p * ssfn_dst.h) - jumpbytes;
+
+    memmove(destination, source, bytestomove);
+
+    memset(destination + ((ssfn_dst.p * ssfn_dst.h) - jumpbytes), 0, jumpbytes);
+
+    terminal_row -= 1;
+}
+
+void terminal_removechar() {
+
 }
 
 void terminal_putchar(char c) {
-  ssfn_dst.x = terminal_column*ssfn_src->width; 
-  ssfn_dst.y = terminal_row*ssfn_src->height;
-
-	ssfn_putc(c);
+    ssfn_dst.x = terminal_column*ssfn_src->width; 
+    ssfn_dst.y = terminal_row*ssfn_src->height;
+    if (c == *"\b") {
+        terminal_scroll(1);
+        // terminal_column -= 1;
+        return;
+    } 
+	  
+    ssfn_putc(c);
   
-  terminal_column += 1;
+    terminal_column += 1;
 
-  if ((terminal_column >= terminal_width) || (c == '\n')) {
-    terminal_row += 1;
-    terminal_column = 0;
-  }
+    if ((terminal_column >= terminal_width) || (c == '\n')) {
+        if (terminal_row >= terminal_height)
+            terminal_scroll(1);
+        terminal_row += 1;
+        terminal_column = 0;
+    }
 }
 
 void terminal_write(const char* data, size_t size) {
-	for (size_t i=0; i<size; i++)
-		terminal_putchar(data[i]);
+    for (size_t i=0; i<size; i++)
+        terminal_putchar(data[i]);
 }
 
 void terminal_writestring(const char* data) {

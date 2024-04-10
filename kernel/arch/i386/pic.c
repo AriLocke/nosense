@@ -3,7 +3,6 @@
 #include <kernel/pic.h>
 
 #include <stdint.h>
-#include <stdio.h>
 #define PIC1		0x20		/* IO base address for master PIC */
 #define PIC2		0xA0		/* IO base address for slave PIC */
 #define PIC1_COMMAND	PIC1
@@ -11,7 +10,7 @@
 #define PIC2_COMMAND	PIC2
 #define PIC2_DATA	(PIC2+1)
 
-static inline void outb(uint16_t port, uint8_t val)
+void outb(uint16_t port, uint8_t val)
 {
     __asm__ volatile ( "outb %b0, %w1" : : "a"(val), "Nd"(port) : "memory");
     /* There"s an outb %al, $imm8 encoding, for compile-time constant port numbers that fit in 8b. (N constraint).
@@ -20,7 +19,7 @@ static inline void outb(uint16_t port, uint8_t val)
      * %1 expands to %dx because  port  is a uint16_t.  %w1 could be used if we had the port number a wider C type */
 }
 
-static inline uint8_t inb(uint16_t port)
+uint8_t inb(uint16_t port)
 {
     uint8_t ret;
     __asm__ volatile ( "inb %w1, %b0"
@@ -30,7 +29,7 @@ static inline uint8_t inb(uint16_t port)
     return ret;
 }
 
-static inline void io_wait(void)
+void io_wait(void)
 {
     outb(0x80, 0);
 }
@@ -160,71 +159,4 @@ void pic_initalize(void) {
   pic_remap(32, 48);
   outb(0x21,0xfd);
   outb(0xa1,0xff);
-}
-
-// #include <keyboard_map.h>
-#define KEYBOARD_DATA_PORT   0x60
-#define KEYBOARD_STATUS_PORT 0x64
-#define ENTER_KEY_CODE 0x1C
-
-unsigned char *keyboard_map[128] =
-{
-    0,  0, "1", "2", "3", "4", "5", "6", "7", "8",	/* 9 */
-  "9", "0", "-", "=", "\b",	/* Backspace */
-  "\t",			/* Tab */
-  "q", "w", "e", "r",	/* 19 */
-  "t", "y", "u", "i", "o", "p", "[", "]", "\n",	/* Enter key */
-    0,			/* 29   - Control */
-  "a", "s", "d", "f", "g", "h", "j", "k", "l", ";",	/* 39 */
- "\"", "`",   0,		/* Left shift */
- "\\", "z", "x", "c", "v", "b", "n",			/* 49 */
-  "m", ",", ".", "/",   0,				/* Right shift */
-  "*",
-    0,	/* Alt */
-  " ",	/* Space bar */
-    0,	/* Caps lock */
-    0,	/* 59 - F1 key ... > */
-    0,   0,   0,   0,   0,   0,   0,   0,
-    0,	/* < ... F10 */
-    0,	/* 69 - Num lock*/
-    0,	/* Scroll Lock */
-    0,	/* Home key */
-    0,	/* Up Arrow */
-    0,	/* Page Up */
-  "-",
-    0,	/* Left Arrow */
-    0,
-    0,	/* Right Arrow */
-  "+",
-    0,	/* 79 - End key*/
-    0,	/* Down Arrow */
-    0,	/* Page Down */
-    0,	/* Insert Key */
-    0,	/* Delete Key */
-    0,   0,   0,
-    0,	/* F11 Key */
-    0,	/* F12 Key */
-    0,	/* All other keys are undefined */
-};
-
-void irq_handler(void) {
-  unsigned char status;
-	char keycode;
-
-  pic_sendEOI(1);
-
-	status = inb(KEYBOARD_STATUS_PORT);
-	/* Lowest bit of status will be set if buffer is not empty */
-	if (status & 0x01) {
-		keycode = inb(KEYBOARD_DATA_PORT);
-		if(keycode < 0)
-			return;
-
-    printf(keyboard_map[(unsigned char) keycode]);
-
-		// if(keycode == ENTER_KEY_CODE) {
-			// printf("\n");
-			// return;
-		// }
-	}
 }

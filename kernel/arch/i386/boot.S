@@ -71,24 +71,25 @@ _start:
 	stack (as it grows downwards on x86 systems). This is necessarily done
 	in assembly as languages such as C cannot function without a stack.
 	*/
-	mov $stack_top, %esp
+    mov $stack_top, %esp
 
 	/* Initialize the stack pointer. */
 	/*  movl    $(stack + STACK_SIZE), %esp */
 
 	/* Reset EFLAGS. */
-	pushl   $0
-	popf
+    pushl   $0
+    popf
 
-	/* Push the pointer to the Multiboot information structure. */
-	pushl   %ebx
-	/* Push the magic value. */
-	pushl   %eax
+    /* Push the pointer to the Multiboot information structure. */
+    pushl   %ebx
+    /* Push the magic value. */
+    pushl   %eax
 	
-	call kernel_boot
+    call kernel_boot
     sti
   # cli
-	call _init
+
+    call _init
 	
 	/*
 	Enter the high-level kernel. The ABI requires the stack is 16-byte
@@ -97,13 +98,13 @@ _start:
 	aligned above and we've pushed a multiple of 16 bytes to the
 	stack since (pushed 0 bytes so far), so the alignment has thus been
 	preserved and the call is well defined.
-	*/
-	call kernel_main
+    */
+    call kernel_main
 
 	/*
 	If the system has nothing more to do, put the computer into an
 	infinite loop. */
-	call hcf
+    call hcf
 
 /*
 Set the size of the _start symbol to the current location '.' minus its start.
@@ -146,9 +147,10 @@ idt_load:
 .global isr\num
 isr\num:
     pusha
-    cld
-    #mov $\num, %eax
+    # cld
+    push $\num
     call fault_handler
+    pop %eax
     popa
     iret 
 .endm
@@ -157,56 +159,61 @@ isr\num:
 .global isr\num
 isr\num:
     pusha
-    cld
-    #mov $\num, %eax
+    # cld
+    push $\num
     call fault_handler
+    pop %eax
     popa
     iret 
 .endm
 
+
 .extern irq_handler
+.extern printf
 
 .macro isr_irq_stub num
 .global isr\num
 isr\num:
     pusha
+    push $\num
     call irq_handler
+    pop %eax
     popa
     iret
 .endm
 
-isr_no_err_stub 0
-isr_no_err_stub 1
-isr_no_err_stub 2
-isr_no_err_stub 3
-isr_no_err_stub 4
-isr_no_err_stub 5
-isr_no_err_stub 6
-isr_no_err_stub 7
-isr_err_stub    8
-isr_no_err_stub 9
-isr_err_stub    10
-isr_err_stub    11
-isr_err_stub    12
-isr_err_stub    13
-isr_err_stub    14
-isr_no_err_stub 15
-isr_no_err_stub 16
-isr_err_stub    17
-isr_no_err_stub 18
-isr_no_err_stub 19
-isr_no_err_stub 20
-isr_no_err_stub 21
-isr_no_err_stub 22
-isr_no_err_stub 23
-isr_no_err_stub 24
-isr_no_err_stub 25
-isr_no_err_stub 26
-isr_no_err_stub 27
-isr_no_err_stub 28
-isr_no_err_stub 29
-isr_err_stub    30
-isr_no_err_stub 31
+isr_no_err_stub 0   # Division By Zero
+isr_no_err_stub 1   # Debug
+isr_no_err_stub 2   # Non Maskable Interupt
+isr_no_err_stub 3   # Breakpoint Exception 
+isr_no_err_stub 4   # Into Detected Overflow
+isr_no_err_stub 5   # Out of Bounds
+isr_no_err_stub 6   # Invalid Opcode
+isr_no_err_stub 7   # No Coprocessor
+isr_err_stub    8   # Double Fault
+isr_no_err_stub 9   # Coprocessor Segment Overrun
+isr_err_stub    10  # Bad TSS
+isr_err_stub    11  # Segment Not Present
+isr_err_stub    12  # Stack Fault
+isr_err_stub    13  # General Protection Fault
+isr_err_stub    14  # Page Fault
+isr_no_err_stub 15  # Unknown Interupt
+isr_no_err_stub 16  # Coprocessor Fault
+isr_err_stub    17  # Alignment Check (486+)
+isr_no_err_stub 18  # Machine Check (Pentium/586+)
+isr_no_err_stub 19  # Reserved
+isr_no_err_stub 20  # Reserved
+isr_no_err_stub 21  # Reserved
+isr_no_err_stub 22  # Reserved
+isr_no_err_stub 23  # Reserved
+isr_no_err_stub 24  # Reserved
+isr_no_err_stub 25  # Reserved
+isr_no_err_stub 26  # Reserved
+isr_no_err_stub 27  # Reserved
+isr_no_err_stub 28  # Reserved
+isr_no_err_stub 29  # Reserved
+isr_err_stub    30  # Reserved
+isr_no_err_stub 31  # Reserved
 
 isr_irq_stub 32
 isr_irq_stub 33

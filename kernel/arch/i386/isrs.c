@@ -1,8 +1,10 @@
+#include "kernel/keyboard.h"
 #include <kernel/isrs.h>
 #include <kernel/idt.h>
+#include <kernel/pic.h>
 
-#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 /* These are function prototypes for all of the exception
 *  handlers: The first 32 entries in the IDT are reserved
@@ -57,11 +59,7 @@ extern void isr45();
 extern void isr46();
 extern void isr47();
 
-/* This is a very repetitive function... it's not hard, it's
-*  just annoying. As you can see, we set the first 32 entries
-*  in the IDT to the first 32 ISRs. We can't use a for loop
-*  for this, because there is no way to get the function names
-*  that correspond to that given entry. We set the access
+/*  We set the access
 *  flags to 0x8E. This means that the entry is present, is
 *  running in ring 0 (kernel level), and has the lower 5 bits
 *  set to the required '14', which is represented by 'E' in
@@ -154,24 +152,34 @@ unsigned char *exception_messages[] =
     "Reserved"
 };
 
-#include <string.h>
-/* All of our Exception handling Interrupt Service Routines will
-*  point to this function. This will tell us what exception has
-*  happened! Right now, we simply halt the system by hitting an
-*  endless loop. All ISRs disable interrupts while they are being
-*  serviced as a 'locking' mechanism to prevent an IRQ from
-*  happening and messing up kernel data structures */
-void fault_handler(uint32_t eax) //struct regs *r)
-{
+
+void fault_handler(uint32_t eax) {
   /* Is this a fault whose number is from 0 to 31? */
-  //if (eax < 32)//r->int_no < 32)
-  //  {
-        /* Display the description for the Exception that occurred.
-        *  In this tutorial, we will simply halt the system using an
-        *  infinite loop */
-    //    printf(int_to_string_alloc(eax));
-    // printf(exception_messages[eax]);
-        printf("\nException Occured. System Halted!\n");
+    if (eax < 32) {
+        char a[10];
+        printf("\nInterupt ");
+        printf(itoa(eax, a, 10));
+        printf(", ");
+        printf(exception_messages[eax]);
+        printf(" Exception Occured. System Halted!\n");
         for (;;);
-  //  }
+    } else {
+        printf("Impossible Exception Called: ");
+        char a[10];
+        printf(itoa(eax, a, 10));
+    }
+}
+
+void irq_handler(uint32_t eax) {
+
+    // pic_sendEOI(1);
+    
+    if (eax == 33) { // Keyboard Interupt
+        keyscan();
+    } else {
+        printf("\nUnhandled IRQ #");
+        char a[10];
+        printf(itoa(eax, a, 10));
+    }
+    pic_sendEOI(1);
 }
