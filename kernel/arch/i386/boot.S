@@ -8,36 +8,36 @@
 
 .set ALIGN,    		1<<0			/* align loaded modules on page boundaries */
 .set MEMINFO,  		1<<1			/* provide memory map */
-.set VIDEOINFO,		1<<2			/* provide memory map */
-.set ADDRESSINFO,	1<<16			/* provide memory map */
+.set VIDEOINFO,		1<<2			/* somethin */
+.set ADDRESSINFO,	1<<16			/* somethin */
 
 .set FLAGS,    ALIGN | MEMINFO | VIDEOINFO	/* this is the Multiboot 'flag' field */
-.set MAGIC,    0x1BADB002       			/* 'magic number' lets bootloader find the header */
-.set CHECKSUM, -(MAGIC + FLAGS) 			/* checksum of above, to prove we are multiboot */
-.set HEADER_ADDR, 0		# Unused unless ADDRESSINFO is flagged
-.set LOAD_ADDR, 0		# Unused unless ADDRESSINFO is flagged
-.set LOAD_END_ADDR, 0	# Unused unless ADDRESSINFO is flagged
-.set BSS_END_ADDR, 0	# Unused unless ADDRESSINFO is flagged
-.set ENTRY_ADDR, 0		# Unused unless ADDRESSINFO is flagged
+.set MAGIC,    0x1BADB002       			      /* 'magic number' lets bootloader find the header */
+.set CHECKSUM, -(MAGIC + FLAGS) 			      /* checksum of above, to prove we are multiboot */
+.set HEADER_ADDR, 0		                      # Unused unless ADDRESSINFO is flagged
+.set LOAD_ADDR, 0		                        # Unused unless ADDRESSINFO is flagged
+.set LOAD_END_ADDR, 0	                      # Unused unless ADDRESSINFO is flagged
+.set BSS_END_ADDR, 0	                      # Unused unless ADDRESSINFO is flagged
+.set ENTRY_ADDR, 0		                      # Unused unless ADDRESSINFO is flagged
 .set MODE_TYPE, 0		
-.set WIDTH, 0			# Prefered number of horizontal pixels
-.set HEIGHT, 0			# Prefered number of vertical pixels
-.set DEPTH, 32			# Prefered number of bits per pixel
+.set WIDTH, 0			                          # Prefered number of horizontal pixels
+.set HEIGHT, 0			                        # Prefered number of vertical pixels
+.set DEPTH, 32			                        # Prefered number of bits per pixel
 
 .section .multiboot
 .align 4
-.long MAGIC	# Required
-.long FLAGS				# Required
+.long MAGIC	        # Required
+.long FLAGS				  # Required
 .long CHECKSUM			# Required
 .long HEADER_ADDR		# Unused unless ADDREsSINFO is flagged
 .long LOAD_ADDR			# Unused unless ADDRESSINFO is flagged
-.long LOAD_END_ADDR		# Unused unless ADDRESSINFO is flagged
-.long BSS_END_ADDR		# Unused unless ADDRESSINFO is flagged
+.long LOAD_END_ADDR	# Unused unless ADDRESSINFO is flagged
+.long BSS_END_ADDR	# Unused unless ADDRESSINFO is flagged
 .long ENTRY_ADDR		# Unused unless ADDRESSINFO is flagged
 .long MODE_TYPE			# Unused unless VIDEOINFO is flagged
-.long WIDTH				# Unused unless VIDEOINFO is flagged
-.long HEIGHT			# Unused unless VIDEOINFO is flagged
-.long DEPTH				# Unused unless VIDEOINFO is flagged
+.long WIDTH				  # Unused unless VIDEOINFO is flagged
+.long HEIGHT			  # Unused unless VIDEOINFO is flagged
+.long DEPTH				  # Unused unless VIDEOINFO is flagged
 
 /*
 The multiboot standard does not define the value of the stack pointer register
