@@ -1,9 +1,8 @@
-#include <stddef.h>
 /*
  * ssfn.h
  * https://gitlab.com/bztsrc/scalable-font2
  *
- * Copyright (C) 2020 bzt (bztsrc@gitlab)
+ * Copyright (C) 2020 - 2022 bzt
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -45,16 +44,15 @@ extern "C" {
 # endif
 #endif
 /* if stdint.h was not included before us */
-#include <stdint.h>
-// #ifndef _STDINT_H
-// typedef unsigned char       uint8_t;
-// typedef unsigned short int  uint16_t;
-// typedef short int           int16_t;
-// typedef unsigned int        uint32_t;
-// #ifndef _UINT64_T
-// typedef unsigned long int   uint64_t;
-// #endif
-// #endif
+#ifndef _STDINT_H
+typedef unsigned char       uint8_t;
+typedef unsigned short int  uint16_t;
+typedef short int           int16_t;
+typedef __UINT32_TYPE__        uint32_t;
+#ifndef _UINT64_T
+typedef __UINT64_TYPE__   uint64_t;
+#endif
+#endif
 
 /***** file format *****/
 
@@ -80,8 +78,8 @@ extern "C" {
 #define SSFN_STYLE_REGULAR      0
 #define SSFN_STYLE_BOLD         1
 #define SSFN_STYLE_ITALIC       2
-#define SSFN_STYLE_USRDEF1      4       /* user defined variant 1 */
-#define SSFN_STYLE_USRDEF2      8       /* user defined variant 2 */
+#define SSFN_STYLE_USRDEF1      4     /* user defined variant 1 */
+#define SSFN_STYLE_USRDEF2      8     /* user defined variant 2 */
 
 /* contour commands */
 #define SSFN_CONTOUR_MOVE       0
@@ -105,86 +103,88 @@ extern "C" {
 #pragma pack(1)
 #endif
 typedef struct {
-    uint8_t     magic[4];               /* SSFN magic bytes */
-    uint32_t    size;                   /* total size in bytes */
-    uint8_t     type;                   /* font family and style */
-    uint8_t     features;               /* format features and revision */
-    uint8_t     width;                  /* overall width of the font */
-    uint8_t     height;                 /* overall height of the font */
-    uint8_t     baseline;               /* horizontal baseline in grid pixels */
-    uint8_t     underline;              /* position of under line in grid pixels */
-    uint16_t    fragments_offs;         /* offset of fragments table */
-    uint32_t    characters_offs;        /* characters table offset */
-    uint32_t    ligature_offs;          /* ligatures table offset */
-    uint32_t    kerning_offs;           /* kerning table offset */
-    uint32_t    cmap_offs;              /* color map offset */
+    uint8_t     magic[4];             /* SSFN magic bytes */
+    uint32_t    size;                 /* total size in bytes */
+    uint8_t     type;                 /* font family and style */
+    uint8_t     features;             /* format features and revision */
+    uint8_t     width;                /* overall width of the font */
+    uint8_t     height;               /* overall height of the font */
+    uint8_t     baseline;             /* horizontal baseline in grid pixels */
+    uint8_t     underline;            /* position of under line in grid pixels */
+    uint16_t    fragments_offs;       /* offset of fragments table */
+    uint32_t    characters_offs;      /* characters table offset */
+    uint32_t    ligature_offs;        /* ligatures table offset */
+    uint32_t    kerning_offs;         /* kerning table offset */
+    uint32_t    cmap_offs;            /* color map offset */
 } _pack ssfn_font_t;
 #ifdef _MSC_VER
 #pragma pack(pop)
 #endif
 
 /***** renderer API *****/
-#define SSFN_FAMILY_ANY      0xff       /* select the first loaded font */
-#define SSFN_FAMILY_BYNAME   0xfe       /* select font by its unique name */
+#define SSFN_FAMILY_ANY      0xff     /* select the first loaded font */
+#define SSFN_FAMILY_BYNAME   0xfe     /* select font by its unique name */
 
 /* additional styles not stored in fonts */
-#define SSFN_STYLE_UNDERLINE   16       /* under line glyph */
-#define SSFN_STYLE_STHROUGH    32       /* strike through glyph */
-#define SSFN_STYLE_NOAA        64       /* no anti-aliasing */
-#define SSFN_STYLE_NOKERN     128       /* no kerning */
-#define SSFN_STYLE_NODEFGLYPH 256       /* don't draw default glyph */
-#define SSFN_STYLE_NOCACHE    512       /* don't cache rasterized glyph */
-#define SSFN_STYLE_NOHINTING 1024       /* no auto hinting grid (not used as of now) */
-#define SSFN_STYLE_RTL       2048       /* render right-to-left */
-#define SSFN_STYLE_ABS_SIZE  4096       /* scale absoulte height */
+#define SSFN_STYLE_UNDERLINE   16     /* under line glyph */
+#define SSFN_STYLE_STHROUGH    32     /* strike through glyph */
+#define SSFN_STYLE_NOAA        64     /* no anti-aliasing */
+#define SSFN_STYLE_NOKERN     128     /* no kerning */
+#define SSFN_STYLE_NODEFGLYPH 256     /* don't draw default glyph */
+#define SSFN_STYLE_NOCACHE    512     /* don't cache rasterized glyph */
+#define SSFN_STYLE_NOHINTING 1024     /* no auto hinting grid (not used as of now) */
+#define SSFN_STYLE_RTL       2048     /* render right-to-left */
+#define SSFN_STYLE_ABS_SIZE  4096     /* scale absoulte height */
+#define SSFN_STYLE_NOSMOOTH  8192     /* no edge-smoothing for bitmaps */
+#define SSFN_STYLE_A        16384     /* keep original alpha channel */
 
 /* error codes */
-#define SSFN_OK                 0       /* success */
-#define SSFN_ERR_ALLOC         -1       /* allocation error */
-#define SSFN_ERR_BADFILE       -2       /* bad SSFN file format */
-#define SSFN_ERR_NOFACE        -3       /* no font face selected */
-#define SSFN_ERR_INVINP        -4       /* invalid input */
-#define SSFN_ERR_BADSTYLE      -5       /* bad style */
-#define SSFN_ERR_BADSIZE       -6       /* bad size */
-#define SSFN_ERR_NOGLYPH       -7       /* glyph (or kerning info) not found */
+#define SSFN_OK                 0     /* success */
+#define SSFN_ERR_ALLOC         -1     /* allocation error */
+#define SSFN_ERR_BADFILE       -2     /* bad SSFN file format */
+#define SSFN_ERR_NOFACE        -3     /* no font face selected */
+#define SSFN_ERR_INVINP        -4     /* invalid input */
+#define SSFN_ERR_BADSTYLE      -5     /* bad style */
+#define SSFN_ERR_BADSIZE       -6     /* bad size */
+#define SSFN_ERR_NOGLYPH       -7     /* glyph (or kerning info) not found */
 
-#define SSFN_SIZE_MAX         192       /* biggest size we can render */
-#define SSFN_ITALIC_DIV         4       /* italic angle divisor, glyph top side pushed width / this pixels */
-#define SSFN_PREC               4       /* precision in bits */
+#define SSFN_SIZE_MAX         192     /* biggest size we can render */
+#define SSFN_ITALIC_DIV         4     /* italic angle divisor, glyph top side pushed width / this pixels */
+#define SSFN_PREC               4     /* precision in bits */
 
 /* destination frame buffer context */
 typedef struct {
-    uint8_t *ptr;                       /* pointer to the buffer */
-    int16_t w;                          /* width (positive: ARGB, negative: ABGR pixels) */
-    int16_t h;                          /* height */
-    uint16_t p;                         /* pitch, bytes per line */
-    int16_t x;                          /* cursor x */
-    int16_t y;                          /* cursor y */
-    uint32_t fg;                        /* foreground color */
-    uint32_t bg;                        /* background color */
+    uint8_t *ptr;                     /* pointer to the buffer */
+    int w;                            /* width (positive: ARGB, negative: ABGR pixels) */
+    int h;                            /* height */
+    uint16_t p;                       /* pitch, bytes per line */
+    int x;                            /* cursor x */
+    int y;                            /* cursor y */
+    uint32_t fg;                      /* foreground color */
+    uint32_t bg;                      /* background color */
 } ssfn_buf_t;
 
 /* cached bitmap struct */
-#define SSFN_DATA_MAX       ((SSFN_SIZE_MAX + 4 + (SSFN_SIZE_MAX + 4) / SSFN_ITALIC_DIV) << 8)
+#define SSFN_DATA_MAX       65536
 typedef struct {
-    uint16_t p;                         /* data buffer pitch, bytes per line */
-    uint8_t h;                          /* data buffer height */
-    uint8_t o;                          /* overlap of glyph, scaled to size */
-    uint8_t x;                          /* advance x, scaled to size */
-    uint8_t y;                          /* advance y, scaled to size */
-    uint8_t a;                          /* ascender, scaled to size */
-    uint8_t d;                          /* descender, scaled to size */
-    uint8_t data[SSFN_DATA_MAX];        /* data buffer */
+    uint16_t p;                       /* data buffer pitch, bytes per line */
+    uint8_t h;                        /* data buffer height */
+    uint8_t o;                        /* overlap of glyph, scaled to size */
+    uint8_t x;                        /* advance x, scaled to size */
+    uint8_t y;                        /* advance y, scaled to size */
+    uint8_t a;                        /* ascender, scaled to size */
+    uint8_t d;                        /* descender, scaled to size */
+    uint8_t data[SSFN_DATA_MAX];      /* data buffer */
 } ssfn_glyph_t;
 
 /* character metrics */
 typedef struct {
-    uint8_t t;                          /* type and overlap */
-    uint8_t n;                          /* number of fragments */
-    uint8_t w;                          /* width */
-    uint8_t h;                          /* height */
-    uint8_t x;                          /* advance x */
-    uint8_t y;                          /* advance y */
+    uint8_t t;                        /* type and overlap */
+    uint8_t n;                        /* number of fragments */
+    uint8_t w;                        /* width */
+    uint8_t h;                        /* height */
+    uint8_t x;                        /* advance x */
+    uint8_t y;                        /* advance y */
 } ssfn_chr_t;
 
 #ifdef SSFN_PROFILING
@@ -195,29 +195,29 @@ typedef struct {
 /* renderer context */
 typedef struct {
 #ifdef SSFN_MAXLINES
-    const ssfn_font_t *fnt[5][16];      /* static font registry */
+    const ssfn_font_t *fnt[5][16];    /* static font registry */
 #else
-    const ssfn_font_t **fnt[5];         /* dynamic font registry */
+    const ssfn_font_t **fnt[5];       /* dynamic font registry */
 #endif
-    const ssfn_font_t *s;               /* explicitly selected font */
-    const ssfn_font_t *f;               /* font selected by best match */
-    ssfn_glyph_t ga;                    /* glyph sketch area */
-    ssfn_glyph_t *g;                    /* current glyph pointer */
+    const ssfn_font_t *s;             /* explicitly selected font */
+    const ssfn_font_t *f;             /* font selected by best match */
+    ssfn_glyph_t ga;                  /* glyph sketch area */
+    ssfn_glyph_t *g;                  /* current glyph pointer */
 #ifdef SSFN_MAXLINES
     uint16_t p[SSFN_MAXLINES*2];
 #else
-    ssfn_glyph_t ***c[17];              /* glyph cache */
+    ssfn_glyph_t ***c[17];            /* glyph cache */
     uint16_t *p;
-    char **bufs;                        /* allocated extra buffers */
+    char **bufs;                      /* allocated extra buffers */
 #endif
-    ssfn_chr_t *rc;                     /* pointer to current character */
+    ssfn_chr_t *rc;                   /* pointer to current character */
     int numbuf, lenbuf, np, ap, ox, oy, ax;
-    int mx, my, lx, ly;                 /* move to coordinates, last coordinates */
-    int len[5];                         /* number of fonts in registry */
-    int family;                         /* required family */
-    int style;                          /* required style */
-    int size;                           /* required size */
-    int line;                           /* calculate line height */
+    int mx, my, lx, ly;               /* move to coordinates, last coordinates */
+    int len[5];                       /* number of fonts in registry */
+    int family;                       /* required family */
+    int style;                        /* required style */
+    int size;                         /* required size */
+    int line;                         /* calculate line height */
 #ifdef SSFN_PROFILING
     uint64_t lookup, raster, blit, kern;/* profiling accumulators */
 #endif
@@ -225,23 +225,23 @@ typedef struct {
 
 /***** API function protoypes *****/
 
-uint32_t ssfn_utf8(char **str);                                                     /* decode UTF-8 sequence */
+uint32_t ssfn_utf8(char **str);                                                   /* decode UTF-8 sequence */
 
 /* normal renderer */
-int ssfn_load(ssfn_t *ctx, const void *data);                                       /* add an SSFN to context */
-int ssfn_select(ssfn_t *ctx, int family, const char *name, int style, int size);    /* select font to use */
-int ssfn_render(ssfn_t *ctx, ssfn_buf_t *dst, const char *str);                     /* render a glyph to a pixel buffer */
-int ssfn_bbox(ssfn_t *ctx, const char *str, int *w, int *h, int *left, int *top);   /* get bounding box */
-ssfn_buf_t *ssfn_text(ssfn_t *ctx, const char *str, unsigned int fg);               /* renders text to a newly allocated buffer */
-int ssfn_mem(ssfn_t *ctx);                                                          /* return how much memory is used */
-void ssfn_free(ssfn_t *ctx);                                                        /* free context */
-#define ssfn_error(err) (err<0&&err>=-7?ssfn_errstr[-err]:"Unknown error")          /* return string for error code */
+int ssfn_load(ssfn_t *ctx, const void *data);                                     /* add an SSFN to context */
+int ssfn_select(ssfn_t *ctx, int family, const char *name, int style, int size);  /* select font to use */
+int ssfn_render(ssfn_t *ctx, ssfn_buf_t *dst, const char *str);                   /* render a glyph to a pixel buffer */
+int ssfn_bbox(ssfn_t *ctx, const char *str, int *w, int *h, int *left, int *top); /* get bounding box */
+ssfn_buf_t *ssfn_text(ssfn_t *ctx, const char *str, unsigned int fg);             /* renders text to a newly allocated buffer */
+int ssfn_mem(ssfn_t *ctx);                                                        /* return how much memory is used */
+void ssfn_free(ssfn_t *ctx);                                                      /* free context */
+#define ssfn_error(err) (err<0&&err>=-7?ssfn_errstr[-err]:"Unknown error")        /* return string for error code */
 extern const char *ssfn_errstr[];
 
 /* simple renderer */
-extern ssfn_font_t *ssfn_src;                                                       /* font buffer */
-extern ssfn_buf_t ssfn_dst;                                                         /* destination frame buffer */
-int ssfn_putc(uint32_t unicode);                                                    /* render console bitmap font */
+extern ssfn_font_t *ssfn_src;                                                     /* font buffer */
+extern ssfn_buf_t ssfn_dst;                                                       /* destination frame buffer */
+int ssfn_putc(uint32_t unicode);                                                  /* render console bitmap font */
 
 /***** renderer implementations *****/
 
@@ -600,35 +600,26 @@ inline static int _ssfn__zhuffman_decode(_ssfn__zbuf *a, _ssfn__zhuffman *z)
 static int _ssfn__zexpand(_ssfn__zbuf *z, char *zout)
 {
    char *q;
-   int cur, limit;
-   z->zout = zout;
-   cur   = (int) (z->zout     - z->zout_start);
-   limit = (int) (z->zout_end - z->zout_start);
-   if(limit == 8) {
-       if(z->zout_start[0] != 'S' || z->zout_start[1] != 'F' || z->zout_start[2] != 'N') return 0;
-       limit = *((uint32_t*)&z->zout_start[4]);
-   } else return 0;
+   unsigned int cur, limit;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuse-after-free"
+#endif
+   z->zout = zout; cur = (unsigned int) (z->zout - z->zout_start); limit = (unsigned int) (z->zout_end - z->zout_start);
+   if(limit == 8) { if(z->zout_start[0] != 'S' || z->zout_start[1] != 'F' || z->zout_start[2] != 'N') return 0; limit = *((uint32_t*)&z->zout_start[4]); } else return 0;
    q = (char *) SSFN_realloc(z->zout_start, limit);
    if (q == NULL) return 0;
-   z->zout_start = q;
-   z->zout       = q + cur;
-   z->zout_end   = q + limit;
+   z->zout_start = q; z->zout = q + cur; z->zout_end = q + limit;
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
    return 1;
 }
 
-static int _ssfn__zlength_base[31] = {
-   3,4,5,6,7,8,9,10,11,13,
-   15,17,19,23,27,31,35,43,51,59,
-   67,83,99,115,131,163,195,227,258,0,0 };
-
-static int _ssfn__zlength_extra[31]=
-{ 0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0,0,0 };
-
-static int _ssfn__zdist_base[32] = { 1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,
-257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577,0,0};
-
-static int _ssfn__zdist_extra[32] =
-{ 0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13};
+static int _ssfn__zlength_base[31]={3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258,0,0};
+static int _ssfn__zlength_extra[31]={0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0,0,0};
+static int _ssfn__zdist_base[32]={1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577,0,0};
+static int _ssfn__zdist_extra[32]={0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13};
 
 static int _ssfn__parse_huffman_block(_ssfn__zbuf *a)
 {
@@ -637,10 +628,7 @@ static int _ssfn__parse_huffman_block(_ssfn__zbuf *a)
       int z = _ssfn__zhuffman_decode(a, &a->z_length);
       if (z < 256) {
          if (z < 0) return 0;
-         if (zout >= a->zout_end) {
-            if (!_ssfn__zexpand(a, zout)) return 0;
-            zout = a->zout;
-         }
+         if (zout >= a->zout_end) { if (!_ssfn__zexpand(a, zout)) return 0; zout = a->zout; }
          *zout++ = (char) z;
       } else {
          unsigned char *p;
@@ -659,12 +647,8 @@ static int _ssfn__parse_huffman_block(_ssfn__zbuf *a)
             zout = a->zout;
          }
          p = (unsigned char *) (zout - dist);
-         if (dist == 1) {
-            unsigned char v = *p;
-            if (len) { do *zout++ = v; while (--len); }
-         } else {
-            if (len) { do *zout++ = *p++; while (--len); }
-         }
+         if (dist == 1) {unsigned char v = *p;if (len) { do *zout++ = v; while (--len); }
+         } else { if (len) { do *zout++ = *p++; while (--len); } }
       }
    }
 }
@@ -931,7 +915,7 @@ int ssfn_select(ssfn_t *ctx, int family, const char *name, int style, int size)
 #ifndef SSFN_MAXLINES
     _ssfn_fc(ctx);
 #endif
-    if((style & ~0x1FFF)) return SSFN_ERR_BADSTYLE;
+    if((style & ~0x5FFF)) return SSFN_ERR_BADSTYLE;
     if(size < 8 || size > SSFN_SIZE_MAX) return SSFN_ERR_BADSIZE;
 
     if(family == SSFN_FAMILY_BYNAME) {
@@ -975,12 +959,15 @@ int ssfn_render(ssfn_t *ctx, ssfn_buf_t *dst, const char *str)
     uint16_t r[640];
     uint32_t unicode, P, O, *Op, *Ol;
     unsigned long int sR, sG, sB, sA;
-    int ret = 0, i, j, k, l, p, m, n, o, s, x, y, w, h, a, A, b, B, nr, uix, uax;
+    int ret = 0, i, j, k, l, p, m, n, o, s, x, y, w, h, H, a, A, b, B, nr, uix, uax;
     int ox, oy, y0, y1, Y0, Y1, x0, x1, X0, X1, X2, xs, ys, yp, pc, fB, fG, fR, fA, bB, bG, bR, dB, dG, dR, dA;
 #ifdef SSFN_PROFILING
     struct timeval tv0, tv1, tvd;
     gettimeofday(&tv0, NULL);
 #endif
+#define PUTPIXEL  O = *Ol;bR = (O >> (16 - cs)) & 0xFF; bG = (O >> 8) & 0xFF; bB = (O >> cs) & 0xFF;\
+    bB += ((fB - bB) * fA) >> 8; bG += ((fG - bG) * fA) >> 8; bR += ((fR - bR) * fA) >> 8;\
+    *Ol = (ctx->style & SSFN_STYLE_A ? O & 0xFF000000 : ((uint32_t)fA << 24)) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
 
     if(!ctx || !str) return SSFN_ERR_INVINP;
     if(!*str) return 0;
@@ -1039,6 +1026,8 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
     if(!ctx->f || !ctx->f->height || !ctx->size) return SSFN_ERR_NOFACE;
     if((unicode >> 16) > 0x10) return SSFN_ERR_INVINP;
     ctx->rc = (ssfn_chr_t*)ptr; ptr += sizeof(ssfn_chr_t);
+    H = (ctx->style & SSFN_STYLE_ABS_SIZE) || SSFN_TYPE_FAMILY(ctx->f->type) == SSFN_FAMILY_MONOSPACE || !ctx->f->baseline ?
+        ctx->size : ctx->size * ctx->f->height / ctx->f->baseline;
 
 #ifdef SSFN_PROFILING
     gettimeofday(&tv1, NULL); tvd.tv_sec = tv1.tv_sec - tv0.tv_sec; tvd.tv_usec = tv1.tv_usec - tv0.tv_usec;
@@ -1054,10 +1043,11 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
     } else
 #endif
     {
-        h = ctx->style & SSFN_STYLE_NOAA ? ctx->size : (ctx->size > ctx->f->height ? (ctx->size + 4) & ~3 : ctx->f->height);
+        h = ctx->style & SSFN_STYLE_NOAA ? H : (ctx->size > ctx->f->height ? (ctx->size + 4) & ~3 : ctx->f->height);
         ci = (ctx->style & SSFN_STYLE_ITALIC) && !(SSFN_TYPE_STYLE(ctx->f->type) & SSFN_STYLE_ITALIC);
         cb = (ctx->style & SSFN_STYLE_BOLD) && !(SSFN_TYPE_STYLE(ctx->f->type) & SSFN_STYLE_BOLD) ? (ctx->f->height+64)>>6 : 0;
         w = (ctx->rc->w * h + ctx->f->height - 1) / ctx->f->height;
+        if(w > SSFN_SIZE_MAX) { h = h * SSFN_SIZE_MAX / w; w = SSFN_SIZE_MAX; }
         p = w + (ci ? h / SSFN_ITALIC_DIV : 0) + cb;
         /* failsafe, should never happen */
         if(p * h >= SSFN_DATA_MAX) return SSFN_ERR_BADSIZE;
@@ -1081,7 +1071,7 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
         x = (ctx->rc->x > 0 && ci ? (ctx->f->height - ctx->f->baseline) * h / SSFN_ITALIC_DIV / ctx->f->height : 0);
         ctx->g->p = p;
         ctx->g->h = h;
-        ctx->g->x = ctx->rc->x + x;
+        ctx->g->x = (ctx->rc->x + x > 255 ? 255 : ctx->rc->x + x);
         ctx->g->y = ctx->rc->y;
         ctx->g->o = (ctx->rc->t & 0x3F) + x;
         SSFN_memset(&ctx->g->data, 0xFF, p * h);
@@ -1174,7 +1164,7 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
                         }
                     }
                 }
-                if(!(ctx->style & SSFN_STYLE_NOAA)) {
+                if(!(ctx->style & (SSFN_STYLE_NOAA|SSFN_STYLE_NOSMOOTH))) {
                     m = color == 0xFD ? 0xFC : 0xFD; o = y * p + p + x;
                     for(k = h; k > ctx->f->height + 4; k -= 2*ctx->f->height) {
                         for(j = 1, l = o; j < a - 1; j++, l += p)
@@ -1229,8 +1219,7 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
     }
     if(dst) {
         /* blit glyph from cache into buffer */
-        h = (ctx->style & SSFN_STYLE_ABS_SIZE) || SSFN_TYPE_FAMILY(ctx->f->type) == SSFN_FAMILY_MONOSPACE || !ctx->f->baseline ?
-            ctx->size : ctx->size * ctx->f->height / ctx->f->baseline;
+        h = H;
         if(h > ctx->line) ctx->line = h;
         w = ctx->g->p * h / ctx->g->h;
         s = ((ctx->g->x - ctx->g->o) * h + ctx->f->height - 1) / ctx->f->height;
@@ -1251,7 +1240,7 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
                 w,h,ctx->rc->w,ctx->rc->h,ctx->g->p,ctx->g->h,ctx->f->height);
 #endif
             fR = (dst->fg >> 16) & 0xFF; fG = (dst->fg >> 8) & 0xFF; fB = (dst->fg >> 0) & 0xFF; fA = (dst->fg >> 24) & 0xFF;
-            bR = (dst->bg >> 16) & 0xFF; bG = (dst->bg >> 8) & 0xFF; bB = (dst->bg >> 0) & 0xFF;
+            bR = (dst->bg >> 16) & 0xFF; bG = (dst->bg >> 8) & 0xFF; bB = (dst->bg >> 0) & 0xFF; O = 0xFF000000;
             Op = (uint32_t*)(dst->ptr + dst->p * (dst->y - oy) + ((dst->x - ox) << 2));
             for (y = 0; y < h && dst->y + y - oy < dst->h; y++, Op += dst->p >> 2) {
                 if(dst->y + y - oy < 0) continue;
@@ -1298,9 +1287,10 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
                         }
                     }
                     if(m) { sR /= m; sG /= m; sB /= m; sA /= m; } else { sR >>= 8; sG >>= 8; sB >>= 8; sA >>= 8; }
+                    if(ctx->style & SSFN_STYLE_NOAA) sA = sA > 127 ? 255 : 0;
                     if(sA > 15) {
-                        *Ol = ((sA > 255 ? 255 : sA) << 24) | ((sR > 255 ? 255 : sR) << (16 - cs)) |
-                            ((sG > 255 ? 255 : sG) << 8) | ((sB > 255 ? 255 : sB) << cs);
+                        *Ol = (ctx->style & SSFN_STYLE_A ? O & 0xFF000000 : ((sA > 255 ? 255 : sA) << 24)) |
+                            ((sR > 255 ? 255 : sR) << (16 - cs)) | ((sG > 255 ? 255 : sG) << 8) | ((sB > 255 ? 255 : sB) << cs);
                         if(y == n) { if(uix > x) { uix = x; } if(uax < x) { uax = x; } }
                     }
                 }
@@ -1314,10 +1304,7 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
                     if(dst->y + y - oy < 0) continue;
                     for (Ol = Op, x = 0; x <= k && dst->x + x - ox < j; x++, Ol++) {
                         if(dst->x + x - ox < 0 || (x > uix && x < uax)) continue;
-                        O = *Ol;
-                        bR = (O >> (16 - cs)) & 0xFF; bG = (O >> 8) & 0xFF; bB = (O >> cs) & 0xFF;
-                        bB += ((fB - bB) * fA) >> 8;  bG += ((fG - bG) * fA) >> 8; bR += ((fR - bR) * fA) >> 8;
-                        *Ol = (fA << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
+                        PUTPIXEL;
                     }
                 }
             }
@@ -1328,10 +1315,7 @@ again:  if(p >= SSFN_FAMILY_BYNAME) { n = 0; m = 4; } else n = m = p;
                     if(dst->y + y - oy < 0) continue;
                     for (Ol = Op, x = 0; x <= k && dst->x + x - ox < j; x++, Ol++) {
                         if(dst->x + x - ox < 0) continue;
-                        O = *Ol;
-                        bR = (O >> (16 - cs)) & 0xFF; bG = (O >> 8) & 0xFF; bB = (O >> cs) & 0xFF;
-                        bB += ((fB - bB) * fA) >> 8; bG += ((fG - bG) * fA) >> 8; bR += ((fR - bR) * fA) >> 8;
-                        *Ol = (fA << 24) | (bR << (16 - cs)) | (bG << 8) | (bB << cs);
+                        PUTPIXEL;
                     }
                 }
             }
@@ -1407,8 +1391,8 @@ int ssfn_bbox(ssfn_t *ctx, const char *str, int *w, int *h, int *left, int *top)
     ssfn_buf_t buf;
     int ret, f = 1, l = 0, t = 0;
 
-    if(!ctx || !str || !w || !h || !top || !left) return SSFN_ERR_INVINP;
-    *w = *h = *top = *left = 0;
+    if(!ctx || !str) return SSFN_ERR_INVINP;
+    if(w) {*w = 0;} if(h) {*h = 0;} if(top) {*top = 0;} if(left) {*left = 0;}
     if(!*str) return SSFN_OK;
     SSFN_memset(&buf, 0, sizeof(ssfn_buf_t)); ctx->line = 0;
     while((ret = ssfn_render(ctx, &buf, str))) {
@@ -1424,8 +1408,8 @@ int ssfn_bbox(ssfn_t *ctx, const char *str, int *w, int *h, int *left, int *top)
     }
     if((ctx->style & SSFN_STYLE_ITALIC) && !(SSFN_TYPE_STYLE(ctx->f->type) & SSFN_STYLE_ITALIC))
         buf.x +=  ctx->size / SSFN_ITALIC_DIV - l;
-    if(ctx->g->x) { *w = buf.x; *h = ctx->line; *left = l; *top = t; }
-    else { *w = buf.w; *h = buf.y; *top = *left = 0; }
+    if(ctx->g->x) { if(w) {*w = buf.x;} if(h) {*h = ctx->line;} if(left) {*left = l;} if(top) {*top = t;} }
+    else { if(w) {*w = buf.w;} if(h) {*h = buf.y;} if(top) {*top = 0;} if(left) {*left = 0;} }
     return SSFN_OK;
 }
 
@@ -1449,8 +1433,10 @@ ssfn_buf_t *ssfn_text(ssfn_t *ctx, const char *str, unsigned int fg)
     buf->fg = fg;
     if(!*str || ssfn_bbox(ctx, str, (int*)&buf->w, (int*)&buf->h, (int*)&buf->x, (int*)&buf->y) != SSFN_OK)
         return buf;
-    buf->ptr = (uint8_t*)SSFN_realloc(NULL, buf->w * buf->h * sizeof(uint32_t));
-    SSFN_memset(buf->ptr, 0, buf->w * buf->h * sizeof(uint32_t));
+    buf->p = buf->w * sizeof(uint32_t);
+    buf->ptr = (uint8_t*)SSFN_realloc(NULL, buf->p * buf->h);
+    SSFN_memset(buf->ptr, 0, buf->p * buf->h);
+    ctx->style &= ~SSFN_STYLE_A;
     while((ret = ssfn_render(ctx, buf, str)) > 0)
         str += ret;
     if(ret != SSFN_OK) { SSFN_free(buf->ptr); SSFN_free(buf); return NULL; }
@@ -1536,11 +1522,8 @@ int ssfn_putc(uint32_t unicode)
             for(p = o, l = 0; l < k; l++, p++, m <<= 1) {
                 if(m > 0x80) { frg++; m = 1; }
                 if(ssfn_dst.x + l >= 0 && (!w || ssfn_dst.x + l < w)) {
-                    if(*frg & m) {
-                        *p = ssfn_dst.fg;
-                    } else if(ssfn_dst.bg) {
-                        *p = ssfn_dst.bg;
-                    }
+                    if(*frg & m) *p = ssfn_dst.fg; else
+                    if(ssfn_dst.bg) *p = ssfn_dst.bg;
                 }
             }
     }
@@ -1569,7 +1552,7 @@ namespace SSFN {
 
         public:
             int Load(const std::string &data);
-            int Load(const unsigned char *data, int len);
+            int Load(const void *data, int len);
             int Select(int family, const std::string &name, int style, int size);
             int Select(int family, const char *name, int style, int size);
             int Render(ssfn_buf_t *dst, const std::string &str);
@@ -1592,12 +1575,12 @@ namespace SSFN {
             ~Font() { ssfn_free(&this->ctx); }
 
         public:
-            int Load(const std::string &data) { return ssfn_load(&this->ctx,(const void*)data.data()); }
-            int Load(const unsigned char *data) { return ssfn_load(&this->ctx, (const void*)data); }
+            int Load(const std::string &data) { return ssfn_load(&this->ctx,reinterpret_cast<const void*>(data.data())); }
+            int Load(const void *data) { return ssfn_load(&this->ctx, data); }
             int Select(int family, const std::string &name, int style, int size)
                 { return ssfn_select(&this->ctx, family, (char*)name.data(), style, size); }
             int Select(int family, char *name, int style, int size) { return ssfn_select(&this->ctx,family,name,style,size); }
-            int Render(ssfn_buf_t *dst, const std::string &str) { return ssfn_render(&this->ctx,dst,(const char*)str.data()); }
+            int Render(ssfn_buf_t *dst, const std::string &str) { return ssfn_render(&this->ctx,dst,(const char *)str.data()); }
             int Render(ssfn_buf_t *dst, const char *str) { return ssfn_render(&this->ctx, dst, str); }
             int BBox(const std::string &str, int *w, int *h, int *left, int *top)
                 { return ssfn_bbox(&this->ctx, (const char *)str.data(), w, h, left, top); }
@@ -1612,5 +1595,6 @@ namespace SSFN {
 #endif
 }
 #endif
-/*  */
+/*                             */
 #endif /* _SSFN_H_ */
+

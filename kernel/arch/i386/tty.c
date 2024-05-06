@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
-#include <stdint.h> // Probably Necessary for SSFN
 #include <lib/ssfn.h>
 #include <lib/multiboot.h>
 #include <lib/incbin.h>
@@ -22,16 +21,16 @@ static size_t terminal_height;
 
 void terminal_initalize(struct multiboot_info *mbi) {
 	/* set up context by global variables */
-	  terminal_row = 0;
-	  terminal_column = 0;
+	terminal_row = 0;
+	terminal_column = 0;
 
-	  ssfn_src = (ssfn_font_t *) &gConsoleFontData[0]; /* the bitmap font to use */
+	ssfn_src = (ssfn_font_t *) &gConsoleFontData[0]; /* the bitmap font to use */
 
-	  ssfn_dst.ptr = (uint8_t *)(uint64_t *) mbi->framebuffer_addr;					    /* address of the linear frame buffer */
-	  ssfn_dst.w = mbi->framebuffer_width;                						/* width */
-	  ssfn_dst.h = mbi->framebuffer_height;						                /* height */
-	  ssfn_dst.p = mbi->framebuffer_bpp * mbi->framebuffer_width / 8;	/* bytes per line */
-	  ssfn_dst.x = ssfn_dst.y = 0;                                    /* pen position */
+	ssfn_dst.ptr = (uint8_t *)(uint64_t *) mbi->framebuffer_addr;					    /* address of the linear frame buffer */
+	ssfn_dst.w = mbi->framebuffer_width;                						/* width */
+	ssfn_dst.h = mbi->framebuffer_height;						                /* height */
+	ssfn_dst.p = mbi->framebuffer_bpp * mbi->framebuffer_width / 8;	/* bytes per line */
+	ssfn_dst.x = ssfn_dst.y = 0;                                    /* pen position */
 
     ssfn_dst.fg = 0xFFFFFF;		/* foreground color */ 
 
@@ -62,6 +61,7 @@ void terminal_removechar() {
 void terminal_putchar(char c) {
     ssfn_dst.x = terminal_column*ssfn_src->width; 
     ssfn_dst.y = terminal_row*ssfn_src->height;
+
     if (c == *"\b") {
         terminal_scroll(1);
         // terminal_column -= 1;

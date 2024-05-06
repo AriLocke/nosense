@@ -10,7 +10,7 @@ cp sysroot/boot/nosense.kernel iso_root/boot/nosense.kernel
  
 cat > iso_root/boot/grub/grub.cfg << EOF
 menuentry "nosense" {
-	multiboot /boot/nosense.kernel
+    multiboot /boot/nosense.kernel
 }
 EOF
 grub-mkrescue -o nosense.iso iso_root

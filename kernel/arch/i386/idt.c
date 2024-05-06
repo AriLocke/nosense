@@ -32,7 +32,8 @@ extern void idt_load();
 
 /* Use this function to set an entry in the IDT. Alot simpler
 *  than twiddling with the GDT ;) */
-void idt_set_gate(uint8_t num, uint64_t base, uint16_t sel, uint16_t flags) {
+// void idt_set_gate(uint8_t num, uint64_t base, uint16_t sel, uint8_t flags) {
+void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
   /* Setup the descriptor base address */
   idt[num].base_lo = (base & 0xFFFF);
   idt[num].base_hi = (base >> 16) & 0xFFFF;

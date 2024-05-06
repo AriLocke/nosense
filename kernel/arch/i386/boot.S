@@ -1,43 +1,42 @@
-/* C symbol format. HAVE_ASM_USCORE is defined by configure. */
+#* C symbol format. HAVE_ASM_USCORE is defined by configure. */
 #ifdef HAVE_ASM_USCORE
 #define EXT_C(sym)                     _ ## sym
 #else
 #define EXT_C(sym)                     sym
 #endif
-#define STACK_SIZE                      0x4000
 
-.set ALIGN,    		1<<0			/* align loaded modules on page boundaries */
-.set MEMINFO,  		1<<1			/* provide memory map */
-.set VIDEOINFO,		1<<2			/* somethin */
-.set ADDRESSINFO,	1<<16			/* somethin */
+.set ALIGN,    		1<<0			#* align loaded modules on page boundaries */
+.set MEMINFO,  		1<<1			#* provide memory map */
+.set VIDEOINFO,		1<<2			#* somethin */
+.set ADDRESSINFO,	1<<16			#* somethin */
 
-.set FLAGS,    ALIGN | MEMINFO | VIDEOINFO	/* this is the Multiboot 'flag' field */
-.set MAGIC,    0x1BADB002       			      /* 'magic number' lets bootloader find the header */
-.set CHECKSUM, -(MAGIC + FLAGS) 			      /* checksum of above, to prove we are multiboot */
-.set HEADER_ADDR, 0		                      # Unused unless ADDRESSINFO is flagged
+.set FLAGS,    ALIGN | MEMINFO | VIDEOINFO		# this is the Multiboot 'flag' field */
+.set MAGIC,    0x1BADB002       				#* 'magic number' lets bootloader find the header */
+.set CHECKSUM, -(MAGIC + FLAGS) 				#* checksum of above, to prove we are multiboot */
+.set HEADER_ADDR, 0 							# Unused unless ADDRESSINFO is flagged
 .set LOAD_ADDR, 0		                        # Unused unless ADDRESSINFO is flagged
-.set LOAD_END_ADDR, 0	                      # Unused unless ADDRESSINFO is flagged
-.set BSS_END_ADDR, 0	                      # Unused unless ADDRESSINFO is flagged
-.set ENTRY_ADDR, 0		                      # Unused unless ADDRESSINFO is flagged
+.set LOAD_END_ADDR, 0	                      	# Unused unless ADDRESSINFO is flagged
+.set BSS_END_ADDR, 0	                      	# Unused unless ADDRESSINFO is flagged
+.set ENTRY_ADDR, 0		                      	# Unused unless ADDRESSINFO is flagged
 .set MODE_TYPE, 0		
-.set WIDTH, 0			                          # Prefered number of horizontal pixels
+.set WIDTH, 0			                   		# Prefered number of horizontal pixels
 .set HEIGHT, 0			                        # Prefered number of vertical pixels
 .set DEPTH, 32			                        # Prefered number of bits per pixel
 
 .section .multiboot
 .align 4
-.long MAGIC	        # Required
-.long FLAGS				  # Required
+.long MAGIC	        	# Required
+.long FLAGS				# Required
 .long CHECKSUM			# Required
 .long HEADER_ADDR		# Unused unless ADDREsSINFO is flagged
 .long LOAD_ADDR			# Unused unless ADDRESSINFO is flagged
-.long LOAD_END_ADDR	# Unused unless ADDRESSINFO is flagged
-.long BSS_END_ADDR	# Unused unless ADDRESSINFO is flagged
+.long LOAD_END_ADDR		# Unused unless ADDRESSINFO is flagged
+.long BSS_END_ADDR		# Unused unless ADDRESSINFO is flagged
 .long ENTRY_ADDR		# Unused unless ADDRESSINFO is flagged
 .long MODE_TYPE			# Unused unless VIDEOINFO is flagged
-.long WIDTH				  # Unused unless VIDEOINFO is flagged
-.long HEIGHT			  # Unused unless VIDEOINFO is flagged
-.long DEPTH				  # Unused unless VIDEOINFO is flagged
+.long WIDTH				# Unused unless VIDEOINFO is flagged
+.long HEIGHT			# Unused unless VIDEOINFO is flagged
+.long DEPTH				# Unused unless VIDEOINFO is flagged
 
 /*
 The multiboot standard does not define the value of the stack pointer register
@@ -66,23 +65,16 @@ doesn't make sense to return from this function as the bootloader is gone.
 .global _start
 .type _start, @function
 _start:
-	/*
-	To set up a stack, we set the esp register to point to the top of the
-	stack (as it grows downwards on x86 systems). This is necessarily done
-	in assembly as languages such as C cannot function without a stack.
-	*/
+    # Move the stack pointer to the location we want the stack to start
     mov $stack_top, %esp
 
-	/* Initialize the stack pointer. */
-	/*  movl    $(stack + STACK_SIZE), %esp */
-
-	/* Reset EFLAGS. */
+   	#* Reset EFLAGS. */
     pushl   $0
     popf
 
-    /* Push the pointer to the Multiboot information structure. */
+    #* Push the pointer to the Multiboot information structure. */
     pushl   %ebx
-    /* Push the magic value. */
+    #* Push the magic value. */
     pushl   %eax
 	
     call kernel_boot
@@ -90,20 +82,9 @@ _start:
   # cli
 
     call _init
-	
-	/*
-	Enter the high-level kernel. The ABI requires the stack is 16-byte
-	aligned at the time of the call instruction (which afterwards pushes
-	the return pointer of size 4 bytes). The stack was originally 16-byte
-	aligned above and we've pushed a multiple of 16 bytes to the
-	stack since (pushed 0 bytes so far), so the alignment has thus been
-	preserved and the call is well defined.
-    */
+    
     call kernel_main
-
-	/*
-	If the system has nothing more to do, put the computer into an
-	infinite loop. */
+    
     call hcf
 
 /*
@@ -231,34 +212,3 @@ isr_irq_stub 44
 isr_irq_stub 45
 isr_irq_stub 46
 isr_irq_stub 47
-
-/* This is our common ISR stub. It saves the processor state, sets
-* up for kernel mode segments, calls the C-level fault handler,
-* and finally restores the stack frame. */ /*
-isr_common_stub:
-    /*pusha
-    push %ds
-    push %es
-    push %fs
-    push %gs
-    #mov $0x10, %ax  # Load the Kernel Data Segment descriptor!
-    #mov %ax, %ds
-    #mov %ax, %es
-    #mov %ax, %fs
-    #mov %ax, %gs
-    mov %esp, %eax   # Push us the stack
-    push %eax */
-   /* pop %eax
-    pop %ebx
-    call fault_handler
-    #mov fault_handler, %eax
-   #call %eax       # A special call, preserves the 'eip' register
-    /*pop %eax
-    pop %gs
-    pop %fs
-    pop %es
-    pop %ds
-    popa
-    add %esp, 8     # Cleans up the pushed error code and pushed ISR number ---------- MAY BE BACKWARDS!!!! THIS WAS INTEL SYNTAX.*/
-    #iret           # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
-    

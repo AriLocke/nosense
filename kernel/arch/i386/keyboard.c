@@ -67,9 +67,9 @@ void keyscan(void) {
     unsigned char status;
     unsigned char keycode;
 
-	  status = inb(KEYBOARD_STATUS_PORT);
+    status = inb(KEYBOARD_STATUS_PORT);
     /*Lowest bit of status will be set if buffer is not empty */
-	  if (status & 0x01) {
+    if (status & 0x01) {
         keycode = inb(KEYBOARD_DATA_PORT);
        
         switch (keycode) {
