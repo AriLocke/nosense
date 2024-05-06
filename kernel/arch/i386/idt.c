@@ -5,17 +5,17 @@
 
 struct idt_entry
 {
-  uint16_t base_lo;
-  uint16_t sel;        /* Our kernel segment goes here! */
-  uint8_t always0;     /* This will ALWAYS be set to 0! */
-  uint8_t flags;       /* Set using the above table! */
-  uint16_t base_hi;
+	uint16_t base_lo;
+	uint16_t sel;        /* Our kernel segment goes here! */
+	uint8_t always0;     /* This will ALWAYS be set to 0! */
+	uint8_t flags;       /* Set using the above table! */
+	uint16_t base_hi;
 } __attribute__((packed));
 
 struct idt_ptr
 {
-    uint16_t limit;
-    uint32_t base;
+	uint16_t limit;
+	uint32_t base;
 } __attribute__((packed));
 
 /* Declare an IDT of 256 entries. Although we will only use the
@@ -34,23 +34,23 @@ extern void idt_load();
 *  than twiddling with the GDT ;) */
 // void idt_set_gate(uint8_t num, uint64_t base, uint16_t sel, uint8_t flags) {
 void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
-  /* Setup the descriptor base address */
-  idt[num].base_lo = (base & 0xFFFF);
-  idt[num].base_hi = (base >> 16) & 0xFFFF;
- 
-  /* Setup sel and flags */
-  idt[num].sel = sel;
-  idt[num].flags = flags;
+	/* Setup the descriptor base address */
+	idt[num].base_lo = (base & 0xFFFF);
+	idt[num].base_hi = (base >> 16) & 0xFFFF;
 
-  /* Ensure always0 is 0 */
-  idt[num].always0 = 0;
+	/* Setup sel and flags */
+	idt[num].sel = sel;
+	idt[num].flags = flags;
+
+	/* Ensure always0 is 0 */
+	idt[num].always0 = 0;
 }
 
 /* Installs the IDT */
 void idt_install() {
-    /* Sets the special IDT pointer up, just like in 'gdt.c' */
-    idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
-    idtp.base = (uintptr_t) &idt;
+  /* Sets the special IDT pointer up, just like in 'gdt.c' */
+	idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
+	idtp.base = (uintptr_t) &idt;
 
     /* Clear out the entire IDT, initializing it to zeros */
     memset(&idt, 0, sizeof(struct idt_entry) * 256);
