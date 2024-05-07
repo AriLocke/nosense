@@ -5,10 +5,10 @@
 #define EXT_C(sym)                     sym
 #endif
 
-.set ALIGN,    		1<<0	# align loaded modules on page boundaries */
-.set MEMINFO,  		1<<1	# provide memory map */
-.set VIDEOINFO,		1<<2	# somethin */
-.set ADDRESSINFO,	1<<16	# somethin */
+.set ALIGN,    		1<<0	# align loaded modules on page boundaries
+.set MEMINFO,  		1<<1	# provide memory map
+.set VIDEOINFO,		1<<2	# something
+.set ADDRESSINFO,	1<<16	# something
 
 .set FLAGS,    ALIGN | MEMINFO | VIDEOINFO		# this is the Multiboot 'flag' field
 .set MAGIC,    0x1BADB002						# 'magic number' lets bootloader find the header
@@ -68,13 +68,13 @@ _start:
     # Move the stack pointer to the location we want the stack to start
     mov $stack_top, %esp
 
-   	#* Reset EFLAGS. */
+   	# Reset EFLAGS.
     pushl   $0
     popf
 
-    #* Push the pointer to the Multiboot information structure. */
+    #* Push the pointer to the Multiboot information structure.
     pushl   %ebx
-    #* Push the magic value. */
+    #* Push the magic value.
     pushl   %eax
 	
     call kernel_boot
