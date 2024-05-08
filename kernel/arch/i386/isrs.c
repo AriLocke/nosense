@@ -1,7 +1,9 @@
-#include "kernel/keyboard.h"
+#include <kernel/isrs.h>
+#include <kernel/keyboard.h>
 #include <kernel/isrs.h>
 #include <kernel/idt.h>
 #include <kernel/pic.h>
+#include <kernel/pit.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -173,13 +175,19 @@ void fault_handler(uint32_t num) {
 void irq_handler(uint32_t num) {
 
     // pic_sendEOI(1);
-    
-    if (num == 33) { // Keyboard Interupt
-        keyscan();
-    } else {
-        printf("\nUnhandled IRQ #");
-        char a[10];
-        printf(itoa(num, a, 10));
-    }
+	
+	switch (num) {
+		case 32:
+			pit_irq_callback();
+			break;
+		case 33:
+	        keyscan();
+			break;
+		default:
+			printf("\nUnhandled IRQ #");
+			char a[4];
+			printf(itoa(num, a, 10));
+	}
+
     pic_sendEOI(1);
 }

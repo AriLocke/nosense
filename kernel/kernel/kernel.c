@@ -3,11 +3,13 @@
 #include <kernel/idt.h>
 #include <kernel/isrs.h>
 #include <kernel/pic.h>
+#include <kernel/pit.h>
 
 #include <lib/multiboot.h>
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
 
@@ -17,8 +19,6 @@ void hcf(void) {
         asm ("hlt");
     }
 }
-
-
 
 multiboot_info_t *mbi;
 
@@ -33,6 +33,7 @@ void kernel_boot(uint32_t magic, uint32_t addr) {
     idt_install();
     isrs_install();
     pic_initalize();
+	pit_initalize(100); // hz
 }
 
 void kernel_main(void) {

@@ -1,7 +1,6 @@
+#include "kernel/tty.h"
 #include <kernel/keyboard.h>
-#include <kernel/pic.h>
-
-#include <stdio.h>
+#include <kernel/io.h>
 
 struct bitflags {
     uint8_t shift_held; // : 1?
@@ -130,7 +129,7 @@ void keyscan(void) {
                         to_upper(&mappedkey);
                     }
 
-                    printf(&mappedkey);
+                    terminal_inputchar(mappedkey);
                 }
         }
     }

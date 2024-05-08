@@ -1,5 +1,7 @@
 #include <kernel/tty.h>
+#include <kernel/pit.h>
 
+#include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdint.h>
@@ -17,8 +19,10 @@ static size_t terminal_column;
 static size_t terminal_width;
 static size_t terminal_height;
 
-// static char key_buffer[256]; 
 static uint8_t bytes_per_pixel;
+
+static char key_buffer[256]; 
+static uint8_t next_free = 0;
 
 void terminal_initalize(struct multiboot_info *mbi) {
 	/* set up context by global variables */
@@ -39,6 +43,14 @@ void terminal_initalize(struct multiboot_info *mbi) {
 
     terminal_width = ssfn_dst.w / ssfn_src->width;			// Terminal Width in Characters
     terminal_height = (ssfn_dst.h / ssfn_src->height) - 1;  // Terminal Height in Characters
+	
+	for(;;) {
+		terminal_placechar(terminal_row*ssfn_src->height, terminal_column*ssfn_src->width, '_');
+		sleep(50);
+		terminal_removechar(terminal_row, terminal_column);
+		sleep(50);
+	}
+	
 }
 
 void terminal_scroll(size_t lines) {
@@ -58,7 +70,6 @@ void terminal_scroll(size_t lines) {
     terminal_row -= lines;
 }
 
-
 void terminal_putchar(char c) {
     ssfn_dst.x = terminal_column*ssfn_src->width; 
     ssfn_dst.y = terminal_row*ssfn_src->height;
@@ -67,12 +78,11 @@ void terminal_putchar(char c) {
 		case ('\b'): // Backspace
 			terminal_column -= 1;
 			terminal_removechar(terminal_row, terminal_column);
+			terminal_removechar(terminal_row, terminal_column+1);
 			break;
 
 		default:
-			if (c == *"R")
-				terminal_writestring("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"); // debug
-			  
+			terminal_removechar(terminal_row, terminal_column);
 			ssfn_putc(c);
 		  
 			terminal_column += 1;
@@ -84,7 +94,21 @@ void terminal_putchar(char c) {
 				terminal_column = 0;
 			}
 	}
-	return;
+}
+
+void terminal_placechar(size_t row, size_t column, char c) {
+    ssfn_dst.x = column; 
+    ssfn_dst.y = row;
+	
+	switch (c) {
+		case ('\b'): // Backspace
+			terminal_removechar(terminal_row, terminal_column);
+			break;
+
+		default:
+			terminal_removechar(terminal_row, terminal_column);
+			ssfn_putc(c);
+	}
 }
 
 void terminal_removechar(size_t row, size_t column) {
@@ -102,4 +126,39 @@ void terminal_write(const char* data, size_t size) {
 
 void terminal_writestring(const char* data) {
     terminal_write(data, strlen(data));
+}
+
+void terminal_inputchar(char c) { // Eventually remove to a seperate prompt program that starts after terminal so idt&stuff can log during bootup
+	terminal_putchar(c);
+	
+	switch (c) {
+		case '\n':
+			terminal_execute(key_buffer);
+			memset(key_buffer, 0, 256);
+			next_free = 0;
+
+			terminal_writestring("$ ");
+
+			break;		
+
+		case '\b':
+			key_buffer[--next_free] = '\0';
+			break;
+		
+		default:
+			key_buffer[next_free++] = c;
+	}
+}
+
+void terminal_execute(char* data) { // a temporary measure until we have something like /bin
+	if (!strcmp(data, "exit")) {
+		printf("Halting the CPU.\n");
+        asm volatile("hlt");
+	} else if (!strcmp(data, "help")) {
+		printf("No\n");
+	} else if (strcmp(data, "\n")) { // If the buffer isnt only a new line
+		printf("Command ");
+		printf(data);
+		printf(" not recognized.\n");
+	}
 }
